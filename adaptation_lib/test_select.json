@@ -1,0 +1,11 @@
+{
+  "FF_Network": false,
+  "FF_PC_PV": false,
+  "FF_Single_Neurons": true,
+  "PC_PV_SST_Network": false,
+  "PC_PV_Network": false,
+  "PC_Neuron": false,
+  "PV_Neuron": false,
+  "SST_Neuron": false,
+  "DE_PV_PC": false
+}
