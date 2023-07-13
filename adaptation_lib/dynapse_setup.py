@@ -2,6 +2,7 @@ from cgi import test
 from pickle import TRUE
 import numpy as np
 import warnings
+import threading
 
 from adaptation_lib.spike_stats import *
 from adaptation_lib.graphing import *
@@ -39,10 +40,19 @@ def undrain_neurons(myConfig,model,neuron_config):
     model.apply_configuration(myConfig)
     time.sleep(0.2)
 
-def DC_input(myConfig,model,rate):
-    set_parameter(myConfig.chips[0].cores[0].parameters, "SOIF_DC_P", 2, int(rate))
-    set_parameter(myConfig.chips[0].cores[1].parameters, "SOIF_DC_P", 2, int(rate))
-    set_parameter(myConfig.chips[0].cores[2].parameters, "SOIF_DC_P", 2, int(rate))
+def DC_input(myConfig,model,in_DC):
+    set_parameter(myConfig.chips[0].cores[0].parameters, "SOIF_DC_P", 3, int(in_DC))
+    set_parameter(myConfig.chips[0].cores[1].parameters, "SOIF_DC_P", 3, int(in_DC))
+    set_parameter(myConfig.chips[0].cores[2].parameters, "SOIF_DC_P", 3, int(in_DC))
+    set_parameter(myConfig.chips[0].cores[3].parameters, "SOIF_DC_P", 3, int(in_DC))
+    model.apply_configuration(myConfig)
+    time.sleep(0.1)
+
+def set_DC_parameter(myConfig,model,coarse,fine):
+    set_parameter(myConfig.chips[0].cores[0].parameters, "SOIF_DC_P", int(coarse), int(fine))
+    set_parameter(myConfig.chips[0].cores[1].parameters, "SOIF_DC_P", int(coarse), int(fine))
+    set_parameter(myConfig.chips[0].cores[2].parameters, "SOIF_DC_P", int(coarse), int(fine))
+    set_parameter(myConfig.chips[0].cores[3].parameters, "SOIF_DC_P", int(coarse), int(fine))
     model.apply_configuration(myConfig)
     time.sleep(0.1)
 
@@ -130,7 +140,7 @@ def FF_run(test_config,board,neuron_config,model,myConfig,input1):
 
     for i in range(iterations):
         if neuron_config['input_type']=='DC':
-            FF_in=np.arange(1,120,10)
+            FF_in=np.arange(1,100,10)
         else:
             FF_in=np.linspace(1,200,12)
         FF_out_PC=[]
@@ -163,8 +173,6 @@ def FF_run(test_config,board,neuron_config,model,myConfig,input1):
         overtake_trial_log.append(overtake_log)
 
     return FF_output,overtake_trial_log
-
-
 
 def FF_single_iteration(model,board,myConfig,test_config,neuron_config,input1,rate):
     nvn=test_config['nvn']
@@ -201,7 +209,7 @@ def FF_single_iteration(model,board,myConfig,test_config,neuron_config,input1,ra
     [cv_values,synchrony_values]=run_dynamic_anal(output_events,test_config)
     test_config['raster_title']='fI:'+str(rate)
     if any(rates[nvn+1:pcn+nvn+pvn+sstn]>1):
-        Network_raster_plot(test_config,output_events,neuron_config,cv_values=cv_values,syn_values=synchrony_values,save_mult=True,show=False,annotate=False)
+        annotated_raster_plot(test_config,output_events,neuron_config,cv_values=cv_values,syn_values=synchrony_values,save_mult=True,show=False,annotate=False)
         overtake=frequency_over_time(test_config,output_events)
     else:
         overtake=1
@@ -357,6 +365,18 @@ def set_configs(myConfig,model,neuron_config):
    model.apply_configuration(myConfig)
    time.sleep(0.2)
 
+def set_all_monitors(number_of_chips,myConfig,model,neuron=10):
+    print("Setting monitors")
+    for h in range(number_of_chips):
+        for c in range(4):
+           
+            myConfig.chips[h].cores[c].neuron_monitoring_on = True
+            myConfig.chips[h].cores[c].monitored_neuron = neuron  # monitor neuron 10 on each core
+    model.apply_configuration(myConfig)
+    time.sleep(0.1)
+
+    return
+
 def sweep_run(neuron_config,myConfig,model,test_config,input1,board):
     nvn=test_config['nvn']
     pcn=test_config['pcn']
@@ -393,9 +413,9 @@ def sweep_run(neuron_config,myConfig,model,test_config,input1,board):
 
         #if the rates exist 
         if any(rates[nvn+1:pcn+nvn+pvn+sstn]>1):
-            Network_raster_plot(test_config,output_events,neuron_config,save_mult=True,show=False,annotate=False,annotate_network=False)
+            annotated_raster_plot(test_config,output_events,neuron_config,save_mult=True,show=False,annotate=False,annotate_network=False)
             fot_output=frequency_over_time(test_config,output_events)
-            graph_frequency_over_time(fot_output,test_config,show=False)
+            frequency_vs_time_plot(fot_output,test_config,show=False)
             sweep_fot_output.append(fot_output)
             #obtain the time to decay
             if neuron_config['decay']==True:
@@ -408,12 +428,33 @@ def sweep_run(neuron_config,myConfig,model,test_config,input1,board):
     np.save(test_config['dir_path']+"/sweep_range_"+test_config['time_label'],  sweep_range)
     np.save(test_config['dir_path']+"/decay_times"+test_config['time_label'],  sweep_decay_output)
     #plot the sweep rates and fot
-    Sweep_rate_graph(sweep_rates_output,sweep_variable,sweep_range,test_config)
-    Sweep_FOT_graph(sweep_fot_output,sweep_variable,sweep_range,sweep_coarse_val,test_config)
+    sweep_frequency_vs_parameter_plot(sweep_rates_output,test_config)
+    sweep_frequency_vs_time_plot(sweep_fot_output,test_config)
 
     if neuron_config['decay']==True:
         decay_grap(sweep_range,sweep_decay_output,sweep_variable,test_config)
         np.save(test_config['dir_path']+"/pc_decay_"+test_config['time_label'],  sweep_decay_output)
+
+def config_handshake(neuron_config,nvn,pvn,pcn,sstn,time_label,dir_path,config_path,plot_path,date_label,raster_path,tname):
+    
+    test_config={'duration':neuron_config['duration'],
+             'in_DC':neuron_config['in_DC'],
+             'in_freq':neuron_config['in_freq'],
+             'input_type':neuron_config['input_type'],
+             'sweep_variable':neuron_config['sweep_variable'],
+             'sweep_coarse_val':neuron_config['sweep_coarse_val'],
+             'sweep_range_fine':neuron_config['sweep_range_fine'],
+             'nvn':nvn,'pvn':pvn,'pcn':pcn,'sstn':sstn,
+             'time_label':time_label,
+             'dir_path':dir_path,
+             'config_path':config_path,
+             'plot_path':plot_path,
+             'date_label':date_label,
+             'raster_path':raster_path,
+             'test_name':tname
+    }
+     
+    return test_config
     
     
  

@@ -13,7 +13,7 @@ from lib.dynapse2_init import connect, dynapse2board
 from test import test_neurons, test_routing, test_synapses, test_homeostasis, test_sadc
 from measure import meas_syn_tau
 from example import wta, perceptron, stp, stdp, stdp_mp, parietal
-from adaptation import  ff_network, pc_pv_sst, pc_pv,pc_single,pv_single,ff_pc_pv,ff,sst_single,pc_pv_de
+from adaptation import  ff_network, pc_pv_sst, pc_pv,pc_single,pv_single,ff_pc_pv,ff,sst_single,pc_pv_de,time_constants
 from configs.neuron_configs import test_selection
 
 import os
@@ -21,6 +21,7 @@ import os
 
 
 def main():
+    '''
     parser = optparse.OptionParser()
     parser.set_usage("Usage: test_sadc.py [options] bitfile [number_of_chips]")
     parser.add_option("-d", "--devboard", action="store_const", const="devboard", dest="device",
@@ -29,6 +30,10 @@ def main():
                       help="use first XEM7310 found together with DYNAP-SE2 Stack board(s)")
     parser.set_defaults(device="stack")
     opts, args = parser.parse_args()
+
+    print(args)
+    '''
+    args=['./bitfiles/Dynapse2Stack.bit', '1']
 
 
     if len(args) == 2:
@@ -65,7 +70,7 @@ def main():
     
     # /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     if test_select['FF_PC_PV']==True:
-        data=ff_pc_pv.ff_pc_pv(board=board, profile_path=os.getcwd() + "/profiles/", number_of_chips=number_of_chips)
+        data=ff_pc_pv.ff_pwc_pv(board=board, profile_path=os.getcwd() + "/profiles/", number_of_chips=number_of_chips)
     if test_select['FF_Network']==True:
         data=ff_network.ff_network(board=board, profile_path=os.getcwd() + "/profiles/", number_of_chips=number_of_chips)
     if test_select['FF_Single_Neurons']==True:
@@ -82,6 +87,8 @@ def main():
         data=sst_single.sst_single(board=board, profile_path=os.getcwd() + "/profiles/", number_of_chips=number_of_chips)
     if test_select['DE_PV_PC']==True:
         data=pc_pv_de.pc_pv_diff(board=board, profile_path=os.getcwd() + "/profiles/", number_of_chips=number_of_chips)
+    if test_select['time_constnats']==True:
+        data=time_constants.time_constants(board=board, profile_path=os.getcwd() + "/profiles/", number_of_chips=number_of_chips)
 
     
     # /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
