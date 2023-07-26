@@ -28,7 +28,7 @@ import datetime
 board_names=["dev_board"]
 
 
-def ff_single_neurons(board, profile_path, number_of_chips):
+def ff_single_neurons(board, profile_path, number_of_chips,neuron_config=neuron_configs()):
    #||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
    #Auto_Save_set_up
    date_label = datetime.date.today().strftime('%Y-%m-%d')
@@ -53,12 +53,9 @@ def ff_single_neurons(board, profile_path, number_of_chips):
    #Set_up_parameters
    nvn=10
    pvn=200
-   pcn=0
-   sstn=0
-   neuron_config=neuron_configs()
-   duration=neuron_config['duration']
-   test_config={'duration':duration,'test_name':tname,'nvn':nvn,'pvn':pvn,'pcn':pcn,'sstn':sstn,'time_label':time_label,'config_path':config_path,'plot_path':plot_path,'date_label':date_label,'raster_path':raster_path}
-
+   pcn=200
+   sstn=200
+   test_config=config_handshake(neuron_config,nvn,pvn,pcn,sstn,time_label,dir_path,config_path,plot_path,date_label,raster_path,tname)
    #||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
    ## set neuron latches
    set_latches(myConfig,model, neuron_config, number_of_chips)
@@ -88,7 +85,7 @@ def ff_single_neurons(board, profile_path, number_of_chips):
 
    # set_monitors(myConfig,model,test_config,PC,PV,SST)
    #||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
-   neuron_config['PC_W0']=[5,55]
+   neuron_config['PC_W0']=[3,200]
    neuron_config['PV_W0']=[3,200]
    neuron_config['SST_W0']=[3,200]
    set_configs(myConfig,model,neuron_config)
@@ -114,9 +111,10 @@ def ff_single_neurons(board, profile_path, number_of_chips):
          set_configs(myConfig,model,neuron_config)
          [FF_output,x]=FF_run(test_config,board,neuron_config,model,myConfig,input1)
          FF_output_array.append(FF_output)
-      plot_FI_sweep(FF_output_array,neuron_config,test_config)
+      sweep_frequency_vs_input_plot(FF_output_array, test_config)
       np.save(dir_path+"/ff_sweep"+time_label, FF_output_array)
    else:
       [FF_output,x]=FF_run(test_config,board,neuron_config,model,myConfig,input1)
-      np.save(dir_path+"/ff_"+time_label, FF_output)
-      mean_frequency_vs_time_graph(FF_output,test_config,neuron_config,annotate=True,annotate_network=False)
+      #np.save(dir_path+"/ff_"+time_label, FF_output)
+      #frequency_vs_input_plot(FF_output, test_config,neuron_config, annotate=False)
+   return FF_output  
