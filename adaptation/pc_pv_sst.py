@@ -57,7 +57,7 @@ def pc_pv_sst(board, profile_path, number_of_chips):
     neuron_config=neuron_configs()
     in_freq=neuron_config['in_freq']
     in_DC=neuron_config['in_DC']
-    test_config={'in_DC':in_DC,'tname':tname,'in_freq':in_freq,'nvn':nvn,'pvn':pvn,'pcn':pcn,'sstn':sstn,'time':time_label,'config_path':config_path,'plot_path':plot_path,'date_label':date_label}
+    test_config=config_handshake(neuron_config,nvn,pvn,pcn,sstn,time_label,dir_path,config_path,plot_path,date_label,raster_path,tname)
     #||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
     # set neuron latches
     set_latches(myConfig,model, neuron_config, number_of_chips)

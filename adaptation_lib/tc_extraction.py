@@ -39,7 +39,6 @@ def epsp_spike(board,input_events):
     time.sleep(1)
     return
 
-
 def pulse(board,number_of_chips,neuron_config):
     neurons = range(256)
     board_names=["dev_board"]
@@ -71,52 +70,7 @@ def pulse(board,number_of_chips,neuron_config):
     time.sleep(.6)
     set_DC_parameter(myConfig,model, 0, 0)
     time.sleep(3)
-
     return
-
-
-def spike_osc_measurement_setup(board,number_of_chips,profile_path,neuron_config):
-    import numpy as np
-    import time
-    #Initialization
-    model = board.get_model()
-    model.reset(ResetType.PowerCycle, (1 << number_of_chips) - 1)
-    time.sleep(1)
-    myConfig = model.get_configuration()
-    model.apply_configuration(myConfig)
-    time.sleep(1)
-    # set neuron latches
-    set_latches(myConfig,model, neuron_config, number_of_chips) 
-    #||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
-    # Set up network
-    network = Network(config=myConfig, profile_path=profile_path, num_chips=number_of_chips)
-    input1 = network.add_virtual_group(size=1)#normal input
-    test_neuron = network.add_group(chip=0, core=neuron_config['core_to_measure'], size=255)
-    #||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
-    #Input Connections
-    network.add_connection(source=input1, target=test_neuron, probability=1,
-                      dendrite=Dendrite.ampa, weight=[True, False, False, False],repeat=1)
-    network.connect()
-    model.apply_configuration(myConfig)
-    time.sleep(0.1)
-    # set current neuron parameters
-    #|||||||||||||||||||||
-    print("Setting parameters")
-    set_configs(myConfig,model,neuron_config)
-    # set neurons spiking threadholds to maximum and leakage to maximum
-    #|||||||||||||||||||||
-    for c in range(4):
-        set_parameter(myConfig.chips[0].cores[c].parameters,'SOIF_SPKTHR_P',5,250)
-        set_parameter(myConfig.chips[0].cores[c].parameters,'SOIF_LEAK_N',5,250)
-    model.apply_configuration(myConfig)
-    # set neurons to monitor
-    #|||||||||||||||||||||
-    myConfig.chips[0].cores[0].neuron_monitoring_on = True
-    myConfig.chips[0].cores[0].monitored_neuron = neuron_config['neuron_to_measure']  # monitor neuron 10 on each core
-    model.apply_configuration(myConfig)
-    time.sleep(0.1)
-    #||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
-
 
 
 def spike_osc_measurement(board,input_events,duration=6):
@@ -164,8 +118,7 @@ def spike_osc_measurement(board,input_events,duration=6):
     return samples,time_values
 
 def pulse_osc_measurement(board,number_of_chips,neuron_config,duration=6,frequency=1200):
- 
-    # Define constants
+  # Define constants
     CHANNEL = 0  # Use first channel
     FREQUENCY = frequency  # Sampling frequency
     DURATION = duration  # Duration of recording in seconds
@@ -210,7 +163,7 @@ def pulse_osc_measurement(board,number_of_chips,neuron_config,duration=6,frequen
 
 from scipy.signal import savgol_filter
 
-def time_constant_extraction(data, full=False, beta=1/26, cut_off=15, window_length=51, polyorder=3):
+def time_constant_extraction(data, output='tc', beta=1/26, cut_off=15, window_length=51, polyorder=3):
     raw_voltage=data[0]*1000
     raw_time=data[1]
 
@@ -264,9 +217,12 @@ def time_constant_extraction(data, full=False, beta=1/26, cut_off=15, window_len
     params, params_covariance = curve_fit(exp_func, time_decay, I_mem, p0=initial_guess,bounds=([0,0,-2], [np.inf,2, 2]))
 
 
-    if full:
-        graph_time_constant_analysis(params, raw_time, raw_voltage, time_masked, voltage_filtered, derivative, decay_threshold, decay_start_index, time_decay, I_mem)
-    else:
+    if output == 'curve':
+        return I_mem, time_decay  
+    elif output== 'analysis': 
+        graph_time_constant_analysis(params, raw_time, raw_voltage, time_masked, voltage_filtered, derivative, decay_threshold, decay_start_index, time_decay, I_mem)   
+        
+    elif output == 'tc':
         return params[1]
 
 
@@ -375,5 +331,49 @@ def measure_spike(board,input_events,duration=1):
         # Always close the device
         analog_instrument.close()
         return time_values,samples
+    
+def measure_pulse(myConfig,model,duration=1):
+    # Define constants
+    CHANNEL = 0  # Use first channel
+    FREQUENCY = 3000.0  # Sampling frequency
+    DURATION = duration# Duration of recording in seconds
+    BUFFER_SIZE = int(FREQUENCY * DURATION)  # Number of samples
+    try:
+        # Create a DWF instance
+        analog_instrument = dwf.DwfAnalogIn()
+        # Open the first available device
+        analog_instrument.channelEnableSet(CHANNEL, True)
+        analog_instrument.channelRangeSet(CHANNEL, 1.0)  # Set voltage range to -5V to +5V
+        # Set the sample rate and buffer size
+        analog_instrument.frequencySet(FREQUENCY)
+        analog_instrument.recordLengthSet(DURATION)
+        # Wait for the device to settle
+        time.sleep(.5)
+        # Start the acquisition
+        analog_instrument.configure(False, True)
+        time.sleep(.02)
+        # Start another function in a separate thread
+        threading.Thread(pulse(myConfig,model)).start()
+        # Wait until the acquisition is done
+        while True:
+            if analog_instrument.status(True) == dwf.DwfStateDone:
+                break
+        # Get the acquired samples
+        samples = analog_instrument.statusData(CHANNEL, BUFFER_SIZE)
+        samples=np.array(samples)*1000
+        # Generate corresponding time values
+        time_values = np.linspace(0, DURATION, num=BUFFER_SIZE, endpoint=False)
+    finally:
+        # Always close the device
+        analog_instrument.close()
+        return time_values,samples
+    
+def pulse(myConfig,model):
+    # set neuron latches to get DC input
+    print("\nAll configurations done!\n")
+    set_DC_parameter(myConfig,model,3,250)
+    time.sleep(.6)
+    set_DC_parameter(myConfig,model, 0, 0)
+    time.sleep(3)
     
 

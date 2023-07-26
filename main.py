@@ -56,7 +56,42 @@ def main():
     board_names = ["dev"]
     board.reset_fpga()
     # remote = connect(opts.device, number_of_chips, samna_node, sender_endpoint, receiver_endpoint, node_id,
-    #                  interpreter_id)
+    #                  interpreter_id) main():
+    '''
+    parser = optparse.OptionParser()
+    parser.set_usage("Usage: test_sadc.py [options] bitfile [number_of_chips]")
+    parser.add_option("-d", "--devboard", action="store_const", const="devboard", dest="device",
+                      help="use first XEM7360 found together with DYNAP-SE2 DevBoard")
+    parser.add_option("-s", "--stack", action="store_const", const="stack", dest="device",
+                      help="use first XEM7310 found together with DYNAP-SE2 Stack board(s)")
+    parser.set_defaults(device="stack")
+    opts, args = parser.parse_args()
+
+    print(args)
+    '''
+    args=['./bitfiles/Dynapse2Stack.bit', '1']
+
+
+    if len(args) == 2:
+        number_of_chips = int(args[1])
+    else:
+        number_of_chips = 1
+
+    # receiver_endpoint = "tcp://0.0.0.0:33335"
+    # sender_endpoint = "tcp://0.0.0.0:33336"
+    # node_id = 1
+    # interpreter_id = 2
+    # samna_node = samna.SamnaNode(sender_endpoint, receiver_endpoint, node_id)
+
+ 
+    deviceInfos = samna.device.get_unopened_devices()
+    print(deviceInfos)
+    
+    global board
+    board = samna.device.open_device(deviceInfos[0])
+    board_names = ["dev"]
+    board.reset_fpga()
+    # remote = connect(opts.device, number_of_chips, samna_node, sender_endpoint,
     
   
     board = dynapse2board(board=board, args=args)

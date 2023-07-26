@@ -158,6 +158,49 @@ def frequency_vs_input_plot(ff_output, test_config,neuron_config, annotate=False
     plt.savefig(test_config['plot_path']+"/"+test_config['time_label'], bbox_inches="tight")
     plt.show()
 
+def frequency_vs_input_simple(ff_output,neuron_config, annotate=False):
+    #Frequency vs input, plots out the means of each populations type 
+    neuron_types = ['PC', 'PV', 'SST']
+    colors = {'PC': 'b', 'PV': 'r', 'SST': 'orange'}
+    graph_type=0
+    plt.style.use('seaborn-white')
+    fig, ax = plt.subplots(figsize=(12,8) if annotate else (10,8))
+
+    for nt in neuron_types:
+            if graph_type==0:
+                means = np.mean(ff_output[neuron_types.index(nt) + 1], axis=0)
+                stds = np.std(ff_output[neuron_types.index(nt) + 1], axis=0)
+                ax.plot(ff_output[0], means, c=colors[nt], label=nt)
+                #plot with error bars
+                ax.errorbar(ff_output[0], means, yerr=stds, c=colors[nt])
+                #ax.fill_between(ff_output[0], means - stds, means + stds, color=colors[nt], alpha=alphas[nt])
+
+            elif graph_type==1:
+                for i in range(len(ff_output[neuron_types.index(nt) + 1])):
+                    ax.plot(ff_output[0], ff_output[neuron_types.index(nt) + 1][i], c=colors[nt], alpha=.1)
+                means = np.mean(ff_output[neuron_types.index(nt) + 1], axis=0)
+                ax.plot(ff_output[0], means, c=colors[nt], label=nt)
+
+    # Further annotations and text can be added similarly
+    #set input strenght annotation
+    input_annotation = f'Input type: {neuron_config["input_type"]}'
+    ax.annotate(input_annotation, xy=(0.9, -0.09), xycoords='axes fraction', size=8, bbox=dict(boxstyle="round", fc="w"))
+    #set Time stamp
+    ax.spines['right'].set_visible(False)
+    ax.spines['top'].set_visible(False)
+    ax.set_ylabel('Output frequency (Hz)',fontsize=18)
+    ax.set_xlabel("DC Fine Value" if neuron_config['input_type']=='DC' else "Input Frequency (Hz)",fontsize=18)
+    ax.set_title(f"STUFF", fontsize=20)
+    # Remove top and right spines
+    ax.spines['right'].set_visible(False)
+    ax.spines['top'].set_visible(False)
+
+    ax.set_ylim(bottom=0)
+    ax.set_xlim(left=0)
+    ax.legend()
+    fig.tight_layout()
+    plt.show()
+
 
 
 def sweep_frequency_vs_input_plot(ffdata, test_config):

@@ -60,18 +60,8 @@ def sst_single(board, profile_path, number_of_chips):
     in_freq=neuron_config['in_freq']
     in_DC=neuron_config['in_DC']
     duration=neuron_config['duration']
-    test_config={'duration':duration,
-                 'in_DC':in_DC,
-                 'test_name':tname,
-                 'in_freq':in_freq,
-                 'nvn':nvn,'pvn':pvn,'pcn':pcn,'sstn':sstn,
-                 'time_label':time_label,
-                 'dir_path':dir_path,
-                 'config_path':config_path,
-                 'plot_path':plot_path,
-                 'date_label':date_label,
-                 'raster_path':raster_path,
-                 'input_type':neuron_config['input_type']}
+    test_config=config_handshake(neuron_config,nvn,pvn,pcn,sstn,time_label,dir_path,config_path,plot_path,date_label,raster_path,tname)
+
     #||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
     # set neuron latches
     set_latches(myConfig,model, neuron_config, number_of_chips)

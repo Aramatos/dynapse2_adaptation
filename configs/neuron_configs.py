@@ -18,8 +18,8 @@ def test_selection():
 
 def neuron_configs():
     neuron_config={
-        'input_type':'Poisson',#regular, striated, or sweep
-        'DC_Latches':False,
+        'input_type':'DC',#regular, striated, or sweep
+        'DC_Latches':True,
         'overtake_test':False,
         'decay':False,
         'duration':1, #duration of simulation in seconds
@@ -32,14 +32,20 @@ def neuron_configs():
         'duration1':300000,#duration of first input in us
         'duration2':300000,#duration of second input in us
         'rest_time':200000,#striated input rest time
+        #oscilloscope test settings
+        'core_to_measure':0,
+        'synapse_to_measure':'ampa',
+        'neuron_to_measure':10,
+        'test_type':'neuron',
+        'DC_pulse':[3,250],
         #sweep settings
-        'sweep':True,#sweep a parameter for single cell tests
+        'sweep':False,#sweep a parameter for single cell tests
         'sweep_variable':'SYAM_STDW_N',#variable to sweep
         'sweep_coarse_val':0,
         'sweep_range_fine':np.linspace(0,250,5,dtype=int),
         #Main Settings
-        'PC_Adaptation':True,
-        'STD':True,
+        'PC_Adaptation':False,
+        'STD':False,
         #Probabilities
         'Input_PC':.8,
         'Input_PV':.1,
@@ -53,8 +59,8 @@ def neuron_configs():
         'SST_PC':.6,
         'SST_PV':.2,
         #PC neuron parameters
-        'PC_GAIN':[1,70],
-        'PC_LEAK':[0,100],#1,100
+        'PC_GAIN':[1,46],
+        'PC_LEAK':[1,46],#1,100
         'PC_REF':[1,110],
         'PC_SPK_THR':[3,100],
         'PC_DC':[0,0],
@@ -65,10 +71,10 @@ def neuron_configs():
         'PC_SOAD_W_N':[3,30],
         'PC_SOAD_CASC_P':[5,250],
         #PC input weight and synapse parameters
-        'PC_AMPA_TAU':[4,30], #5 msinput ampa synapse timesconat 
+        'PC_AMPA_TAU':[1, 60], #5 msinput ampa synapse timesconat 
         'PC_AMPA_GAIN':[3,100], 
         #PC self excitation [NMDA] 
-        'PC_NMDA_TAU':[1,100],
+        'PC_NMDA_TAU':[0,20],
         'PC_NMDA_GAIN':[2,125],
         #PC GABA Inhibition from SST [GABA B]
         'PC_GABA_TAU':[1,60],
@@ -84,10 +90,10 @@ def neuron_configs():
         #||||||||||||||||||||||||||||||||||||||||||||||||||
         #PV neuron parameters
         'PV_GAIN':[5,250],
-        'PV_LEAK':[3,30],
+        'PV_LEAK':[1,90],
         'PV_REF':[1,200],
         'PV_SPK_THR':[2,160],
-        'PV_DC':[0,10],
+        'PV_DC':[0,0],
         #PV input weight and synape parameters
         'PV_AMPA_TAU':[2,60], # 5ms input ampta synapse timecosntan, maybe slower
         'PV_AMPA_GAIN':[4,200], #
@@ -108,7 +114,7 @@ def neuron_configs():
         #||||||||||||||||||||||||||||||||||||||||||||||||||
         #SST neuron parameters
         'SST_GAIN':[1,120],
-        'SST_LEAK':[1,60],
+        'SST_LEAK':[1,44],
         'SST_REF':[1,140],
         'SST_SPK_THR':[3,100],
         'SST_DC':[0,0],

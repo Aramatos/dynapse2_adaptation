@@ -3,7 +3,9 @@ from pickle import TRUE
 import numpy as np
 import warnings
 import threading
+import samna
 
+from lib.dynapse2_init import connect, dynapse2board
 from adaptation_lib.spike_stats import *
 from adaptation_lib.graphing import *
 from lib.dynapse2_util import *
@@ -11,6 +13,29 @@ from lib.dynapse2_network import Network
 from lib.dynapse2_spikegen import get_fpga_time, send_virtual_events, poisson_gen,regular_gen,striated_gen
 from lib.dynapse2_raster import *
 from lib.dynapse2_obj import *
+
+def obtain_board():
+    args=['./bitfiles/Dynapse2Stack.bit', '1']
+
+
+    if len(args) == 2:
+        number_of_chips = int(args[1])
+    else:
+        number_of_chips = 1
+
+    deviceInfos = samna.device.get_unopened_devices()
+    print(deviceInfos)
+    
+    global board
+    board = samna.device.open_device(deviceInfos[0])
+    board_names = ["dev"]
+    board.reset_fpga()
+
+    profile_path=os.getcwd() + "/profiles/"
+    board = dynapse2board(board=board, args=args)
+    
+    return board,profile_path,number_of_chips
+
 
 def create_events(input1,nvn,neuron_config,in_freq,duration):
     if neuron_config['Striated']==True:
@@ -140,7 +165,7 @@ def FF_run(test_config,board,neuron_config,model,myConfig,input1):
 
     for i in range(iterations):
         if neuron_config['input_type']=='DC':
-            FF_in=np.arange(1,100,10)
+            FF_in=np.arange(1,80,10)
         else:
             FF_in=np.linspace(1,200,12)
         FF_out_PC=[]
