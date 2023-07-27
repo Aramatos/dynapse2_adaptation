@@ -52,9 +52,9 @@ def ff_single_neurons(board, profile_path, number_of_chips,neuron_config=neuron_
    #||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
    #Set_up_parameters
    nvn=10
-   pvn=200
-   pcn=200
-   sstn=200
+   pvn=250
+   pcn=250
+   sstn=250
    test_config=config_handshake(neuron_config,nvn,pvn,pcn,sstn,time_label,dir_path,config_path,plot_path,date_label,raster_path,tname)
    #||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
    ## set neuron latches
@@ -66,6 +66,8 @@ def ff_single_neurons(board, profile_path, number_of_chips,neuron_config=neuron_
    PC = network.add_group(chip=0, core=0, size=pcn)
    PV = network.add_group(chip=0, core=1, size=pvn)
    SST= network.add_group(chip=0, core=2, size=sstn)
+   set_monitors(myConfig,model,test_config,PC=PC,PV=PV,SST=SST)
+
    #||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
    #Input Connections
    if pcn>0:

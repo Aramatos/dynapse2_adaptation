@@ -92,15 +92,15 @@ def set_monitors(myConfig,model,test_config,PC=0,PV=0,SST=0):
    if pcn>0:  
     c=0
     myConfig.chips[h].cores[c].neuron_monitoring_on = True
-    myConfig.chips[h].cores[c].monitored_neuron = PC.neurons[10]  
+    myConfig.chips[h].cores[c].monitored_neuron = 10
    if pvn>0: 
     c=1
     myConfig.chips[h].cores[c].neuron_monitoring_on = True
-    myConfig.chips[h].cores[c].monitored_neuron = PV.neurons[8]  
+    myConfig.chips[h].cores[c].monitored_neuron = 23  
    if sstn>0: 
     c=2
     myConfig.chips[h].cores[c].neuron_monitoring_on = True
-    myConfig.chips[h].cores[c].monitored_neuron = SST.neurons[8]  
+    myConfig.chips[h].cores[c].monitored_neuron =30
    model.apply_configuration(myConfig)
    time.sleep(0.1)
 
@@ -165,7 +165,7 @@ def FF_run(test_config,board,neuron_config,model,myConfig,input1):
 
     for i in range(iterations):
         if neuron_config['input_type']=='DC':
-            FF_in=np.arange(1,80,10)
+            FF_in=neuron_config['DC_FI_Range']
         else:
             FF_in=np.linspace(1,200,12)
         FF_out_PC=[]
@@ -212,12 +212,12 @@ def FF_single_iteration(model,board,myConfig,test_config,neuron_config,input1,ra
     get_events(board=board, extra_time=100, output_events=output_events)
     undrain_neurons(myConfig,model,neuron_config)
     input_events=create_events(input1,nvn,neuron_config,rate,duration)
-
+    coarse=neuron_config['DC_Coarse']
     if neuron_config['input_type']=='DC':
-        set_parameter(myConfig.chips[0].cores[0].parameters, "SOIF_DC_P", 3, int(rate))
-        set_parameter(myConfig.chips[0].cores[1].parameters, "SOIF_DC_P", 3, int(rate))
-        set_parameter(myConfig.chips[0].cores[2].parameters, "SOIF_DC_P", 3, int(rate))
-        set_parameter(myConfig.chips[0].cores[3].parameters, "SOIF_DC_P", 3, int(rate))
+        set_parameter(myConfig.chips[0].cores[0].parameters, "SOIF_DC_P", coarse, int(rate))
+        set_parameter(myConfig.chips[0].cores[1].parameters, "SOIF_DC_P", coarse, int(rate))
+        set_parameter(myConfig.chips[0].cores[2].parameters, "SOIF_DC_P", coarse, int(rate))
+        set_parameter(myConfig.chips[0].cores[3].parameters, "SOIF_DC_P", coarse, int(rate))
         model.apply_configuration(myConfig)
         time.sleep(0.01)
         min_delay=duration*1e6

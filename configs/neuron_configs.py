@@ -19,6 +19,9 @@ def test_selection():
 def neuron_configs():
     neuron_config={
         'input_type':'DC',#regular, striated, or sweep
+                #General Latch Settings
+        'PC_Adaptation':False,
+        'STD':False,
         'DC_Latches':True,
         'overtake_test':False,
         'decay':False,
@@ -43,9 +46,10 @@ def neuron_configs():
         'sweep_variable':'SYAM_STDW_N',#variable to sweep
         'sweep_coarse_val':0,
         'sweep_range_fine':np.linspace(0,250,5,dtype=int),
-        #Main Settings
-        'PC_Adaptation':False,
-        'STD':False,
+
+        #F-I settings
+        'DC_Coarse':3,
+        'DC_FI_Range':np.linspace(0,250,5,dtype=int),
         #Probabilities
         'Input_PC':.8,
         'Input_PV':.1,

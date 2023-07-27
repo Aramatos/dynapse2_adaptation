@@ -72,6 +72,47 @@ def pulse(board,number_of_chips,neuron_config):
     time.sleep(3)
     return
 
+def normalize_input(input_array, max_value=1.0):
+    """
+    Function to normalize input data within a specified range.
+    
+    Parameters:
+    input_array (np.ndarray): The input data to be normalized.
+    max_value (float): The maximum value for normalization. Default is 1.0.
+
+    Returns:
+    np.ndarray: The normalized input data.
+    """
+    data_min = np.min(input_array)
+    data_max = np.max(input_array)
+
+    # Adjust the normalization according to the max_value parameter
+    adjusted_data_max = data_min + ((data_max - data_min) * max_value)
+
+    normalized_input = (input_array - data_min) / (adjusted_data_max - data_min)
+
+    return normalized_input
+
+def custom_relu(x, start_rise, slope, saturation):
+    """
+    Custom piece-wise linear function with a flat portion, a rising slope, and a saturation point.
+
+    Parameters:
+        x (float or numpy array): Input value(s).
+        start_rise (float): Starting point of the rising slope.
+        slope (float): Slope of the rising portion.
+        saturation (float): Saturation point where the function plateaus.
+
+    Returns:
+        float or numpy array: Output value(s) after applying the custom piece-wise linear function.
+    """
+    linear_part = lambda x: slope * (x - start_rise)
+    saturated_part = lambda x: np.full_like(x, saturation)
+    
+    return np.piecewise(x, 
+                        [x < start_rise, (x >= start_rise) & (x < saturation/slope + start_rise), x >= saturation/slope + start_rise], 
+                        [0, linear_part, saturated_part])
+
 
 def spike_osc_measurement(board,input_events,duration=6):
     # Define constants
