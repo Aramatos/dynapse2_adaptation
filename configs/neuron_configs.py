@@ -19,7 +19,7 @@ def test_selection():
 def neuron_configs():
     neuron_config={
         'input_type':'DC',#regular, striated, or sweep
-                #General Latch Settings
+        #General Latch Settings
         'PC_Adaptation':False,
         'STD':False,
         'DC_Latches':True,
@@ -48,8 +48,8 @@ def neuron_configs():
         'sweep_range_fine':np.linspace(0,250,5,dtype=int),
 
         #F-I settings
-        'DC_Coarse':3,
-        'DC_FI_Range':np.linspace(0,250,5,dtype=int),
+        'DC_Coarse':2,
+        'DC_FI_Range':np.linspace(0,250,10,dtype=int),
         #Probabilities
         'Input_PC':.8,
         'Input_PV':.1,
@@ -63,10 +63,10 @@ def neuron_configs():
         'SST_PC':.6,
         'SST_PV':.2,
         #PC neuron parameters
-        'PC_GAIN':[1,46],
+        'PC_GAIN':[1,10],
         'PC_LEAK':[1,46],#1,100
-        'PC_REF':[1,110],
-        'PC_SPK_THR':[3,100],
+        'PC_REF':[1,80],
+        'PC_SPK_THR':[2,20],
         'PC_DC':[0,0],
         #PC adaptation parameters
         'PC_SOAD_PWTAU_N':[2,150],
@@ -93,10 +93,10 @@ def neuron_configs():
         'PC_W3':[4,250], #SST shunt inhibition
         #||||||||||||||||||||||||||||||||||||||||||||||||||
         #PV neuron parameters
-        'PV_GAIN':[5,250],
+        'PV_GAIN':[2,30],
         'PV_LEAK':[1,90],
-        'PV_REF':[1,200],
-        'PV_SPK_THR':[2,160],
+        'PV_REF':[2,100],
+        'PV_SPK_THR':[3,60],
         'PV_DC':[0,0],
         #PV input weight and synape parameters
         'PV_AMPA_TAU':[2,60], # 5ms input ampta synapse timecosntan, maybe slower
@@ -117,10 +117,10 @@ def neuron_configs():
         'PV_W3':[4,150], # SST shunt inhibition
         #||||||||||||||||||||||||||||||||||||||||||||||||||
         #SST neuron parameters
-        'SST_GAIN':[1,120],
+        'SST_GAIN':[1,150],
         'SST_LEAK':[1,44],
         'SST_REF':[1,140],
-        'SST_SPK_THR':[3,100],
+        'SST_SPK_THR':[3,55],
         'SST_DC':[0,0],
         #SST input weight and synape parameters
         'SST_AMPA_TAU':[2,60],

@@ -423,3 +423,5 @@ def spike_time_array(output_events, nvn, pvn, pcn, sstn, neuron_type):
 
     # Return spike times for the specified neuron type
     return spike_times_type
+
+

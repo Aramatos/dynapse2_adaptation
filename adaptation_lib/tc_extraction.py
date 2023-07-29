@@ -31,6 +31,42 @@ from scipy.signal import butter, filtfilt
 
 board_names=["dev_board"]
 
+def change_synapse_leak(myConfig,test_type,model,core_to_measure,coarse,fine):
+    #input_events=regular_gen(input_neuron,1,10,1)
+    if test_type=='AMPA':
+        #set ampa synapse parameters
+        set_parameter(myConfig.chips[0].cores[core_to_measure].parameters,'DEAM_ETAU_P',coarse,fine)
+    elif test_type=='NMDA':    
+        #set nmda synapse parameters
+        set_parameter(myConfig.chips[0].cores[core_to_measure].parameters, 'DENM_ETAU_P', coarse,fine)#PC to PC
+    elif test_type=='GABA_B':
+        #set GABA B slow inhibitory substractive synapse parameters
+        set_parameter(myConfig.chips[0].cores[core_to_measure].parameters, 'DEGA_ITAU_P',coarse,fine)# SST to PC
+    elif test_type=='GABA_A':
+        #set GABA A fast inhibitory shunt synapse parameters 
+        set_parameter(myConfig.chips[0].cores[core_to_measure].parameters, 'DESC_ITAU_P',coarse,fine)# PV to PC
+    model.apply_configuration(myConfig)
+    time.sleep(0.1)
+
+
+def change_synapse_gain(myConfig,test_type,model,core_to_measure,coarse,fine):
+    #input_events=regular_gen(input_neuron,1,10,1)
+    if test_type=='AMPA':
+        #set ampa synapse parameters
+        set_parameter(myConfig.chips[0].cores[core_to_measure].parameters,'DEAM_EGAIN_P',coarse,fine)
+    elif test_type=='NMDA':    
+        #set nmda synapse parameters
+        set_parameter(myConfig.chips[0].cores[core_to_measure].parameters, 'DENM_EGAIN_P', coarse,fine)#PC to PC
+    elif test_type=='GABA_B':
+        #set GABA B slow inhibitory substractive synapse parameters
+        set_parameter(myConfig.chips[0].cores[core_to_measure].parameters, 'DEGA_IGAIN_P',coarse,fine)# SST to PC
+    elif test_type=='GABA_A':
+        #set GABA A fast inhibitory shunt synapse parameters 
+        set_parameter(myConfig.chips[0].cores[core_to_measure].parameters, 'DESC_IGAIN_P',coarse,fine)# PV to PC
+    model.apply_configuration(myConfig)
+    time.sleep(0.1)
+
+
 def epsp_spike(board,input_events):
     min_delay=10000
     print("\ngetting fpga time\n")
@@ -337,10 +373,10 @@ def graph_time_constant_analysis(params_2,raw_time,raw_voltage,time_masked,volta
     # Show the plot
     plt.show()
 
-def measure_spike(board,input_events,duration=1):
+def measure_spike(board,input_events,duration=1,frequency=3000):
     # Define constants
     CHANNEL = 0  # Use first channel
-    FREQUENCY = 3000.0  # Sampling frequency
+    FREQUENCY = frequency  # Sampling frequency
     DURATION = duration# Duration of recording in seconds
     BUFFER_SIZE = int(FREQUENCY * DURATION)  # Number of samples
     try:
@@ -416,5 +452,82 @@ def pulse(myConfig,model):
     time.sleep(.6)
     set_DC_parameter(myConfig,model, 0, 0)
     time.sleep(3)
-    
+
+def Fit_FI_Curves(FF_output,neuron_config,max_val=250/250,plot=True):
+    [FF_in, FF_out_PC, FF_out_PV, FF_out_SST, FF_cv] = FF_output
+
+    window=len(FF_in)
+    means_PC = np.mean(FF_out_PC, axis=0)[:window]
+    stds_PC = np.std(FF_out_PC, axis=0)[:window]
+    means_PV = np.mean(FF_out_PV, axis=0)[:window]
+    stds_PV = np.std(FF_out_PV, axis=0)[:window]
+    means_SST = np.mean(FF_out_SST, axis=0)[:window]
+    stds_SST = np.std(FF_out_SST, axis=0)[:window]
+    FF_in = FF_in[:window]
+
+    # Normalize FF_in with your desired max_value (e.g., 200/250)
+    normalized_FF_in = normalize_input(FF_in, max_value=max_val)
+
+    # Calculate the fitted values
+    fit_PC = custom_relu((normalized_FF_in),.06,124,60) #threshold, gain, maximum firing rate
+    fit_PV = custom_relu((normalized_FF_in),.36,334,160)
+    fit_SST = custom_relu((normalized_FF_in),.18,198,90)
+
+    # Compute residuals
+    residuals_PC = means_PC - fit_PC
+    residuals_PV = means_PV - fit_PV
+    residuals_SST = means_SST - fit_SST
+
+    # Calculate root-mean-square error rounded to 2 decimal places
+
+    rmse_PC = np.sqrt(np.mean(residuals_PC**2))
+    rmse_PV = np.sqrt(np.mean(residuals_PV**2))
+    rmse_SST = np.sqrt(np.mean(residuals_SST**2))
+
+    if plot==True:
+        #Plotting
+        fig, ax1 = plt.subplots(figsize=(8, 6))
+
+        # Plot with error bars vs input DC parameter
+        ax1.errorbar(FF_in, means_PC, yerr=stds_PC, c='cornflowerblue',label='PC dynapse')
+        ax1.errorbar(FF_in, means_PV, yerr=stds_PV, c='coral',label='PV dynapse')
+        ax1.errorbar(FF_in, means_SST, yerr=stds_SST, c='greenyellow',label='SST dynapse')
+
+        ax1.legend()
+        ax1.set_title('F-I curve')
+        ax1.set_ylabel('Output frequency (Hz)')
+        ax1.set_xlabel(f'Input DC (fine parameter), coarse: {neuron_config["DC_Coarse"]}')
+
+        # Plot the fitted curves
+        ax2 = ax1.twiny()
+        ax2.plot(normalized_FF_in, fit_PC, 'b-.', label='PC bio fit')
+        ax2.plot(normalized_FF_in, fit_PV, 'r-.', label='PV bio fit')
+        ax2.plot(normalized_FF_in, fit_SST, 'g-.', label='SST bio fit')
+        ax2.set_ylim(0, 200)
+
+        # Offset the twin axis below the host
+        ax2.spines["bottom"].set_position(("axes", -0.15))
+
+        # Remove right and top borders
+        ax1.spines['right'].set_visible(False)
+        ax1.spines['top'].set_visible(False)
+        ax2.spines['right'].set_visible(False)
+        ax2.spines['top'].set_visible(False)
+
+        ax2.set_xlabel('Input Pulse normalized')
+
+        # Move twinned axis ticks and label from top to bottom
+        ax2.xaxis.set_ticks_position("bottom")
+        ax2.xaxis.set_label_position("bottom")
+
+        #legend
+        ax2.legend(bbox_to_anchor=(.5, 1), loc='upper right',fontsize=13)
+
+
+        #create input annotation with rmse errors rounded to two decimal places
+
+        input_annotation = f'RMSE for PC: {np.round(rmse_PC,2)}\nRMSE for PV: {np.round(rmse_PV,2)}\nRMSE for SST: {np.round(rmse_SST,2)}'
+        ax1.annotate(input_annotation, xy=(.8, 0.1), xycoords='axes fraction', size=8, bbox=dict(boxstyle="round", fc="w"))
+    return rmse_PC,rmse_PV,rmse_SST
+
 
