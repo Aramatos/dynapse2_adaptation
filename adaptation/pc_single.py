@@ -25,7 +25,7 @@ import datetime
 
 board_names=["dev_board"]
 
-def pc_single(board, profile_path, number_of_chips):
+def pc_single(board, profile_path, number_of_chips,neuron_config=neuron_configs()):
     #||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
     #Auto_Save_set_up
     date_label = datetime.date.today().strftime('%Y-%m-%d')
@@ -53,22 +53,10 @@ def pc_single(board, profile_path, number_of_chips):
     pvn=0
     pcn=200
     sstn=0
-    neuron_config=neuron_configs()
     in_freq=neuron_config['in_freq']
     in_DC=neuron_config['in_DC']
     duration=neuron_config['duration']
-    test_config={'duration':duration,
-                 'in_DC':in_DC,
-                 'test_name':tname,
-                 'in_freq':in_freq,
-                 'nvn':nvn,'pvn':pvn,'pcn':pcn,'sstn':sstn,
-                 'time_label':time_label,
-                 'dir_path':dir_path,
-                 'config_path':config_path,
-                 'plot_path':plot_path,
-                 'date_label':date_label,
-                 'raster_path':raster_path,
-                 'input_type':neuron_config['input_type']}
+    test_config=config_handshake(neuron_config,nvn,pvn,pcn,sstn,time_label,dir_path,config_path,plot_path,date_label,raster_path,tname)
     #||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
     # set neuron latches
     set_latches(myConfig,model, neuron_config, number_of_chips) 
@@ -120,15 +108,15 @@ def pc_single(board, profile_path, number_of_chips):
         #obtain cv and cc values
         [cv_values,synchrony_values]=run_dynamic_anal(output_events,test_config)
         #plotting
-        Network_raster_plot(test_config,output_events,neuron_config,cv_values=cv_values,syn_values=synchrony_values,save=True,show=True,annotate=True,annotate_network=False)
+        script_annotated_raster_plot(test_config,output_events,neuron_config,cv_values=cv_values,syn_values=synchrony_values,save=True,show=True,annotate=True,annotate_network=False)
         #PSTH
         [spike_times_nvn,spike_times_pvn,spike_times_pcn,spike_times_sstn]=spike_time_arrays(output_events,nvn,pvn,pcn,sstn)
         plot_psth(test_config,spike_times_pcn, bin_size=0.025)
         #FOT
         fot_output=frequency_over_time(test_config,output_events)
-        graph_frequency_over_time(fot_output,test_config,save=False,show=True)
+        frequency_vs_time_plot(fot_output,test_config,save=False,annotate=False,show=False)
         np.save(test_config['dir_path']+"/pc_"+test_config['time_label'],  output_events)
     #||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
     print("time label: "+str(time_label))
-    return
+    return output_events
 

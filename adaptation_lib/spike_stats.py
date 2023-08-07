@@ -348,8 +348,8 @@ def fot_decay(fot_output):
 # Assuming spike_times_pcn is a list of spike times for the 'pcn' spike train
 # Example: spike_times_pcn = [np.array([0.2, 0.3, 0.5]), np.array([0.1, 0.4, 0.6])]
 
-def psth_calc(test_config,spike_times, bin_size=0.011):
-    duration=test_config['duration']
+def psth_calc(spike_times, bin_size=0.011,duration=1):
+
     """Calculate the peristimulus time histogram (PSTH) for a given spike train.
     Parameters
     ----------
@@ -376,7 +376,7 @@ def psth_calc(test_config,spike_times, bin_size=0.011):
     return psth, bins
     
 
-def spike_time_arrays(output_events,nvn,pvn,pcn,sstn):
+def spike_time_arrays(output_events,nvn=0,pvn=0,pcn=0,sstn=0):
     output_events=np.asanyarray(output_events)
     spike_times_all=output_events[1]-output_events[1][0]
     neuron_indexes=output_events[0]

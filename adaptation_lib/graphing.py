@@ -29,7 +29,7 @@ def simple_raster_plot(output_events,dir_path,time_label,plot_name,show=False):
     else:
         plt.close()
 
-def annotated_raster_plot(test_config,output_events,neuron_config,cv_values=[404,404,404],syn_values=[404,404,404],save=False,show=False,save_mult=False,annotate=False,annotate_network=False):
+def script_annotated_raster_plot(test_config,output_events,neuron_config,cv_values=[404,404,404],syn_values=[404,404,404],save=False,show=False,save_mult=False,annotate=False,annotate_network=False):
     neuron_types = ['PC', 'PV', 'SST']
     colors = {'PC': 'b', 'PV': 'r', 'SST': 'orange'}
     neuron_counts = {nt: test_config[nt.lower() + 'n'] for nt in neuron_types}
@@ -104,7 +104,7 @@ def get_id_times(nvn, pcn, test_id, time):
 
 
 ##############
-# Frequency vs input plots
+# Frequency output over 1 second vs various inputs
 ##############
 
 def frequency_vs_input_plot(ff_output, test_config,neuron_config, annotate=False):
@@ -250,7 +250,7 @@ def sweep_frequency_vs_input_plot(ffdata, test_config):
 
 
 ##########
-#Frequency vs sweep parameter plot
+#Frequency output over 1 second vs a sweept parameter plot
 ##########
 def sweep_frequency_vs_parameter_plot(sweep_rates_output, test_config):
     """
@@ -298,7 +298,7 @@ def sweep_frequency_vs_parameter_plot(sweep_rates_output, test_config):
 
 
 ##########
-#Frequency vs time plots
+#Frequency over a time bin vs time plots
 ##########
 
 def sweep_frequency_vs_time_plot(sweep_rates_output, test_config):
@@ -349,7 +349,7 @@ def frequency_vs_time_plot(fot_output,test_config,save=False,annotate=False,show
     '''I am a docstring'''
     plt.style.use('seaborn-white')
 
-    fig, ax = plt.subplots(figsize=(12,8) if annotate else (10,8))
+    fig, ax = plt.subplots(figsize=(12,8) if annotate else (12,8))
     ax.plot(fot_output[0],fot_output[1][0:len(fot_output[0])],c='cadetblue',label=' PC_neurons')
     ax.plot(fot_output[0],fot_output[2][0:len(fot_output[0])],c='lightcoral',label=' PV_neurons')
     ax.plot(fot_output[0],fot_output[3][0:len(fot_output[0])],c='sandybrown',label=' SST_neurons')
@@ -494,12 +494,12 @@ def annotate_plot(neuron_types,neuron_counts,neuron_config,ax):
                     annotation_string_2 += f"\n{nt}_tau: {neuron_config[nt + '_SOAD_TAU_P'][0]}|{neuron_config[nt + '_SOAD_TAU_P'][1]}"
                     annotation_string_2 += f"\n{nt}_w: {neuron_config[nt + '_SOAD_W_N'][0]}|{neuron_config[nt + '_SOAD_W_N'][1]}"
                     annotation_string_2 += f"\n{nt}_casc: {neuron_config[nt + '_SOAD_CASC_P'][0]}|{neuron_config[nt + '_SOAD_CASC_P'][1]}"
-                    plt.text(.12*5,-.09,annotation_string_2, transform=ax.transAxes, va="top", ha="left", fontsize=8, bbox=annotation_box_config)
+                    plt.text(.12*3+.01,-.09,annotation_string_2, transform=ax.transAxes, va="top", ha="left", fontsize=8, bbox=annotation_box_config)
                 if nt == 'PV': 
                     annotation_string_3 = f"{nt}_STD: {neuron_config['STD']}"
                     annotation_string_3 += f"\n{nt}_SYAM_STDW_N: {neuron_config['SYAM_STDW_N'][0]}|{neuron_config['SYAM_STDW_N'][1]}"
                     annotation_string_3 += f"\n{nt}_SYAW_STDSTR_N: {neuron_config['SYAW_STDSTR_N'][0]}|{neuron_config['SYAW_STDSTR_N'][1]}"
-                    plt.text(.12*6,-.09,annotation_string_3, transform=ax.transAxes, va="top", ha="left", fontsize=8, bbox=annotation_box_config)
+                    plt.text(.12*4+.01,-.09,annotation_string_3, transform=ax.transAxes, va="top", ha="left", fontsize=8, bbox=annotation_box_config)
                 plt.text(.12*i, -.09, annotation_string, transform=ax.transAxes, va="top", ha="left", fontsize=8, bbox=annotation_box_config)
 
 
@@ -516,6 +516,6 @@ def annotate_plot_network(neuron_types,neuron_counts,neuron_config,ax):
         if nt == 'PC':
                 annotation_string = f"{nt}_NMDA_TAU: {neuron_config[nt+'_NMDA_TAU'][0]}|{neuron_config[nt+'_NMDA_TAU'][1]}"
                 annotation_string  += f"\n{nt}_NMDA_GAIN: {neuron_config[nt+'_NMDA_GAIN'][0]}|{neuron_config[nt+'_NMDA_GAIN'][1]}"
-        plt.text(.12*(i+7), -.09, annotation_string, transform=ax.transAxes, va="top", ha="left", fontsize=8, bbox=annotation_box_config)
+        plt.text(.12*(i+5), -.09, annotation_string, transform=ax.transAxes, va="top", ha="left", fontsize=8, bbox=annotation_box_config)
          
     

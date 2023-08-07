@@ -27,7 +27,7 @@ import datetime
 board_names=["dev_board"]
 
 
-def pc_pv_sst(board, profile_path, number_of_chips):
+def pc_pv_sst(board, profile_path, number_of_chips,neuron_config):
     #||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
     #Auto_Save_set_up
     date_label = datetime.date.today().strftime('%Y-%m-%d')
@@ -36,6 +36,7 @@ def pc_pv_sst(board, profile_path, number_of_chips):
     tname = "PC,PV & SST Network"
     dir_path = f"./data/{tname}/{date_label}"
     config_path = f"{dir_path}/config"
+    raster_path = f"{dir_path}/plots/rasters/{time_label}"
     plot_path = f"{dir_path}/plots"
     os.makedirs(f"{config_path}",exist_ok=True)
     os.makedirs(f"{plot_path}",exist_ok=True)
@@ -49,25 +50,17 @@ def pc_pv_sst(board, profile_path, number_of_chips):
     model.apply_configuration(myConfig)
     time.sleep(1)
     #||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
-    #Set_up_parameters
-    nvn=1
-    pvn=10
-    pcn=80
-    sstn=10
-    neuron_config=neuron_configs()
-    in_freq=neuron_config['in_freq']
-    in_DC=neuron_config['in_DC']
-    test_config=config_handshake(neuron_config,nvn,pvn,pcn,sstn,time_label,dir_path,config_path,plot_path,date_label,raster_path,tname)
+    test_config=config_handshake(neuron_config,neuron_config['nvn'],neuron_config['pvn'],neuron_config['pcn'],neuron_config['sstn'],time_label,dir_path,config_path,plot_path,date_label,raster_path,tname)
     #||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
     # set neuron latches
     set_latches(myConfig,model, neuron_config, number_of_chips)
     #||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
     # Set up network
     network = Network(config=myConfig, profile_path=profile_path, num_chips=number_of_chips)
-    input1 = network.add_virtual_group(size=nvn)#normal input
-    PC = network.add_group(chip=0, core=0, size=pcn)
-    PV = network.add_group(chip=0, core=1, size=pvn)
-    SST= network.add_group(chip=0, core=2, size=sstn)
+    input1 = network.add_virtual_group(size=neuron_config['nvn'])#normal input
+    PC = network.add_group(chip=0, core=0, size=neuron_config['pcn'])
+    PV = network.add_group(chip=0, core=1, size=neuron_config['pvn'])
+    SST= network.add_group(chip=0, core=2, size=neuron_config['sstn'])
     #||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
     #Input Connections
     network.add_connection(source=input1, target=PC, probability=neuron_config['Input_PC'],
@@ -115,15 +108,12 @@ def pc_pv_sst(board, profile_path, number_of_chips):
     #||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
     #Emulation run
     #Input event
-    input_events=create_events(input1,neuron_config,in_freq,neuron_config['duration'])
+    input_events=create_events(input1,neuron_config['nvn'],neuron_config,neuron_config['in_freq'])
     output_events=run_dynapse(neuron_config,board,input_events)
-    [cv_values,synchrony_values]=run_dynamic_anal(output_events,test_config)
-    rates=spike_count(output_events=output_events,show=False)
-    pop_rates(rates,test_config)
-    Network_raster_plot(test_config,output_events,neuron_config,cv_values=cv_values,syn_values=synchrony_values,save=True,show=True,annotate=True,annotate_network=True)
-    frequency_over_time(test_config,output_events,save=True,show=True)
+
+ 
     # /⅞save_config_axis1(test_config,myConfig,number_of_chips,tname)
     np.save(dir_path+"/pc_pv_s"+time_label,  output_events)
     # /⅞print("time label: "+str(time_label))
 
-    return 
+    return output_events,test_config

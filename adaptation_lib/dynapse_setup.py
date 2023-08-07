@@ -37,18 +37,18 @@ def obtain_board():
     return board,profile_path,number_of_chips
 
 
-def create_events(input1,nvn,neuron_config,in_freq,duration):
+def create_events(input1,nvn,neuron_config,in_Freq):
     if neuron_config['Striated']==True:
-      input_events = striated_gen(input1,neuron_config,in_freq)
+      input_events = striated_gen(input1,neuron_config,in_Freq)
     elif neuron_config['input_type']=='Regular':
-      input_events=regular_gen(input1,nvn,in_freq,duration)
+      input_events=regular_gen(input1,nvn,in_Freq,neuron_config['duration'])
     elif neuron_config['input_type']=='Poisson':
-      input_events = poisson_gen(start=0, duration=duration*1e6, virtual_groups=[input1], rates=[in_freq])
+      input_events = poisson_gen(start=0, duration=neuron_config['duration']*1e6, virtual_groups=[input1], rates=[in_Freq])
     elif neuron_config['input_type']=='DC':
       input_events =[]
     else:
         warnings.warn("Input type not defined")
-        exit
+        pass
     return input_events
 
 def drain_neurons(myConfig,model):
@@ -151,6 +151,29 @@ def run_dynapse(neuron_config,board,input_events):
     time.sleep(1)
     return output_events
 
+
+def run_dynapse_thread(neuron_config,board,input_events,result):
+    print('initilize run dynapse')
+    output_events = [[], []]
+    send_virtual_events(board=board, virtual_events=[],min_delay=10000)
+    print('initilize run dynapse')
+    get_events(board=board, extra_time=100, output_events=output_events)
+    if neuron_config['input_type']=='DC':
+      min_delay=neuron_config['duration']*1e6
+    elif neuron_config['input_type']=='Striated':
+      min_delay=neuron_config['duration']*1e6
+    else:
+      min_delay=10000
+    print("\ngetting fpga time\n")
+    ts = get_fpga_time(board=board) + 100000
+    print("\nsetting virtual neurons\n")
+    send_virtual_events(board=board, virtual_events=input_events, offset=int(ts), min_delay=int(min_delay))
+    output_events = [[], []]
+    get_events(board=board, extra_time=10000, output_events=output_events)
+    time.sleep(1)
+    result['output'] = output_events
+ 
+
 def FF_run(test_config,board,neuron_config,model,myConfig,input1):
     nvn=test_config['nvn']
     pcn=test_config['pcn']
@@ -167,14 +190,14 @@ def FF_run(test_config,board,neuron_config,model,myConfig,input1):
         if neuron_config['input_type']=='DC':
             FF_in=neuron_config['DC_FI_Range']
         else:
-            FF_in=np.linspace(1,200,12)
+            FF_in=neuron_config['Freq_FI_Range']
         FF_out_PC=[]
         FF_out_PV=[]
         FF_out_SST=[]
         CV_ff_log=[]
         overtake_log=[]
-        for rate in FF_in:
-            [rates,cv_values,synchrony_values,overtake]=FF_single_iteration(model,board,myConfig,test_config,neuron_config,input1,rate)
+        for in_Freq in FF_in:
+            [rates,cv_values,synchrony_values,overtake]=FF_single_iteration(model,board,myConfig,test_config,neuron_config,input1,in_Freq)
             if len(rates)==0:
                 FF_out_PC.append([0]*pcn)
                 FF_out_PV.append([0]*pvn)
@@ -199,25 +222,25 @@ def FF_run(test_config,board,neuron_config,model,myConfig,input1):
 
     return FF_output,overtake_trial_log
 
-def FF_single_iteration(model,board,myConfig,test_config,neuron_config,input1,rate):
+def FF_single_iteration(model,board,myConfig,test_config,neuron_config,input1,in_Freq):
     nvn=test_config['nvn']
     pcn=test_config['pcn']
     pvn=test_config['pvn']
     sstn=test_config['sstn']
     duration = int(neuron_config['duration'])
-    test_config['in_freq']=int(rate)
-    test_config['in_DC']=int(rate)
+    test_config['in_freq']=int(in_Freq)
+    test_config['in_DC']=int(in_Freq)
     output_events = [[], []]
     send_virtual_events(board=board, virtual_events=[])
     get_events(board=board, extra_time=100, output_events=output_events)
     undrain_neurons(myConfig,model,neuron_config)
-    input_events=create_events(input1,nvn,neuron_config,rate,duration)
+    input_events=create_events(input1,nvn,neuron_config,in_Freq)
     coarse=neuron_config['DC_Coarse']
     if neuron_config['input_type']=='DC':
-        set_parameter(myConfig.chips[0].cores[0].parameters, "SOIF_DC_P", coarse, int(rate))
-        set_parameter(myConfig.chips[0].cores[1].parameters, "SOIF_DC_P", coarse, int(rate))
-        set_parameter(myConfig.chips[0].cores[2].parameters, "SOIF_DC_P", coarse, int(rate))
-        set_parameter(myConfig.chips[0].cores[3].parameters, "SOIF_DC_P", coarse, int(rate))
+        set_parameter(myConfig.chips[0].cores[0].parameters, "SOIF_DC_P", coarse, int(in_Freq))
+        set_parameter(myConfig.chips[0].cores[1].parameters, "SOIF_DC_P", coarse, int(in_Freq))
+        set_parameter(myConfig.chips[0].cores[2].parameters, "SOIF_DC_P", coarse, int(in_Freq))
+        set_parameter(myConfig.chips[0].cores[3].parameters, "SOIF_DC_P", coarse, int(in_Freq))
         model.apply_configuration(myConfig)
         time.sleep(0.01)
         min_delay=duration*1e6
@@ -232,9 +255,9 @@ def FF_single_iteration(model,board,myConfig,test_config,neuron_config,input1,ra
     rates=spike_count(output_events=output_events,show=False)
     pop_rates(rates,test_config)
     [cv_values,synchrony_values]=run_dynamic_anal(output_events,test_config)
-    test_config['raster_title']='fI:'+str(rate)
+    test_config['raster_title']='fI:'+str(in_Freq)
     if any(rates[nvn+1:pcn+nvn+pvn+sstn]>1):
-        annotated_raster_plot(test_config,output_events,neuron_config,cv_values=cv_values,syn_values=synchrony_values,save_mult=True,show=False,annotate=False)
+        script_annotated_raster_plot(test_config,output_events,neuron_config,cv_values=cv_values,syn_values=synchrony_values,save_mult=True,show=False,annotate=False)
         overtake=frequency_over_time(test_config,output_events)
     else:
         overtake=1

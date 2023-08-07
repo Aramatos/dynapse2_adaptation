@@ -51,7 +51,7 @@ def ff_single_neurons(board, profile_path, number_of_chips,neuron_config=neuron_
    time.sleep(1)
    #||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
    #Set_up_parameters
-   nvn=10
+   nvn=1
    pvn=250
    pcn=250
    sstn=250
@@ -87,9 +87,6 @@ def ff_single_neurons(board, profile_path, number_of_chips,neuron_config=neuron_
 
    # set_monitors(myConfig,model,test_config,PC,PV,SST)
    #||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
-   neuron_config['PC_W0']=[3,200]
-   neuron_config['PV_W0']=[3,200]
-   neuron_config['SST_W0']=[3,200]
    set_configs(myConfig,model,neuron_config)
    #///////////////////////////////////////////////////////////////////////////////////
    print("\nPC Neurons\n")
@@ -117,6 +114,4 @@ def ff_single_neurons(board, profile_path, number_of_chips,neuron_config=neuron_
       np.save(dir_path+"/ff_sweep"+time_label, FF_output_array)
    else:
       [FF_output,x]=FF_run(test_config,board,neuron_config,model,myConfig,input1)
-      #np.save(dir_path+"/ff_"+time_label, FF_output)
-      #frequency_vs_input_plot(FF_output, test_config,neuron_config, annotate=False)
-   return FF_output  
+   return FF_output,test_config
