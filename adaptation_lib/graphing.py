@@ -29,7 +29,7 @@ def simple_raster_plot(output_events,dir_path,time_label,plot_name,show=False):
     else:
         plt.close()
 
-def script_annotated_raster_plot(test_config,output_events,neuron_config,cv_values=[404,404,404],syn_values=[404,404,404],save=False,show=False,save_mult=False,annotate=False,annotate_network=False):
+def script_annotated_raster_plot(test_config,output_events,neuron_config,cv_values=[404,404,404],syn_values=[404,404,404],save=False,save_mult=False,annotate=False,annotate_network=False):
     neuron_types = ['PC', 'PV', 'SST']
     colors = {'PC': 'b', 'PV': 'r', 'SST': 'orange'}
     neuron_counts = {nt: test_config[nt.lower() + 'n'] for nt in neuron_types}
@@ -83,15 +83,16 @@ def script_annotated_raster_plot(test_config,output_events,neuron_config,cv_valu
     if save_mult==True:
         raster_path=test_config['raster_path']
         raster_title=test_config['raster_title']
-        plt.savefig(raster_path+"/"+raster_title+"_"+time_label+".png")
+        plt.savefig(raster_path+"/"+raster_title+"_"+time_label+".svg")
     elif save==True:
-        plt.savefig(plot_path+"/Net_Raster_"+time_label+".png")
+        plt.savefig(plot_path+"/Net_Raster_"+time_label+".svg")
     else:
         pass
-    if show==True:
-        plt.show()
-    else:
-        plt.close()
+
+    plt.tight_layout()
+    plt.close
+    
+    return fig
 
 def get_id_times(nvn, pcn, test_id, time):
     id = []
@@ -342,7 +343,7 @@ def sweep_frequency_vs_time_plot(sweep_rates_output, test_config):
     ax.spines['right'].set_visible(False)
     ax.spines['top'].set_visible(False)
     
-    plt.savefig(f"{test_config['plot_path']}/FVT{test_config['time_label']}", bbox_inches="tight")
+    plt.savefig(f"{test_config['plot_path']}/FVT{test_config['time_label']}.svg", bbox_inches="tight")
     plt.show()
 
 def frequency_vs_time_plot(fot_output,test_config,save=False,annotate=False,show=False):
@@ -365,10 +366,10 @@ def frequency_vs_time_plot(fot_output,test_config,save=False,annotate=False,show
         plt.savefig(test_config['plot_path']+"/FvT_"+test_config['time_label']+".svg")
     else:
         pass
-    if show==True:
-        plt.show()
-    else:
-        plt.close()
+    plt.close()
+    
+    return fig
+    
 
 ################
 # PSTH plots
@@ -478,14 +479,15 @@ def decay_grap(x,y,sweep_variable,test_config):
 ###############
 
 def annotate_plot(neuron_types,neuron_counts,neuron_config,ax):
-        annotation_box_config = dict(boxstyle="round", fc="w")
+
         for i, nt in enumerate(neuron_types):
             if neuron_counts[nt] > 0:
+                annotation_string = f"\n{nt}_W_0: {neuron_config[nt + '_W0'][0]}|{neuron_config[nt + '_W0'][1]}\n{nt}_W_1: {neuron_config[nt + '_W1'][0]}|{neuron_config[nt + '_W1'][1]}"
+                annotation_string += f"\n{nt}_W_2: {neuron_config[nt + '_W2'][0]}|{neuron_config[nt + '_W2'][1]}\n{nt}_W_3: {neuron_config[nt + '_W3'][0]}|{neuron_config[nt + '_W3'][1]}"
                 annotation_string = f"{nt}_gain: {neuron_config[nt + '_GAIN'][0]}|{neuron_config[nt + '_GAIN'][1]}\n{nt}_leak: {neuron_config[nt + '_LEAK'][0]}|{neuron_config[nt + '_LEAK'][1]}"
                 annotation_string += f"\n{nt}_ref: {neuron_config[nt + '_REF'][0]}|{neuron_config[nt + '_REF'][1]}\n{nt}_spk_thr: {neuron_config[nt + '_SPK_THR'][0]}|{neuron_config[nt + '_SPK_THR'][1]}"
                 annotation_string += f"\n{nt}_ampa_tau: {neuron_config[nt + '_AMPA_TAU'][0]}|{neuron_config[nt + '_AMPA_TAU'][1]}\n{nt}_ampa_gain: {neuron_config[nt + '_AMPA_GAIN'][0]}|{neuron_config[nt + '_AMPA_GAIN'][1]}"
                 annotation_string += f"\n{nt}_W_0: {neuron_config[nt + '_W0'][0]}|{neuron_config[nt + '_W0'][1]}\n{nt}_W_1: {neuron_config[nt + '_W1'][0]}|{neuron_config[nt + '_W1'][1]}"
-                annotation_string += f"\n{nt}_W_2: {neuron_config[nt + '_W2'][0]}|{neuron_config[nt + '_W2'][1]}\n{nt}_W_3: {neuron_config[nt + '_W3'][0]}|{neuron_config[nt + '_W3'][1]}"
                 annotation_string += f"\n{nt}_DC: {neuron_config[nt + '_DC']}"
                 if nt == 'PC':
                     annotation_string_2 = f"{nt}_adaptation: {neuron_config[nt + '_Adaptation']}"
@@ -505,17 +507,48 @@ def annotate_plot(neuron_types,neuron_counts,neuron_config,ax):
 
 
 def annotate_plot_network(neuron_types,neuron_counts,neuron_config,ax):
-    annotate_plot(neuron_types,neuron_counts,neuron_config,ax)
+    down_coordinate=.15
     annotation_box_config = dict(boxstyle="round", fc="w")
+    annotation_string_con=f"Connections:"
+    annotation_string_con += f"\nIn_PC:  {neuron_config['Input_PC']}"
+    annotation_string_con += f"\nIn_PV:  {neuron_config['Input_PV']}"
+    annotation_string_con += f"\nIn_SST:  {neuron_config['Input_SST']}"
+    annotation_string_con += f"\nPC_PC:  {neuron_config['PC_PC']}"
+    annotation_string_con += f"\nPC_PV:  {neuron_config['PC_PV']}"
+    annotation_string_con += f"\nPC_SST:  {neuron_config['PC_SST']}"
+    annotation_string_con += f"\nPV_PV:  {neuron_config['PV_PV']}"
+    annotation_string_con += f"\nPV_PC:  {neuron_config['PV_PC']}"
+    annotation_string_con += f"\nPV_SST:  {neuron_config['PV_SST']}"
+    annotation_string_con += f"\nSST_PC:  {neuron_config['SST_PC']}"
+    annotation_string_con += f"\nSST_PV:  {neuron_config['SST_PV']}"
+    annotation_string_con += f"\n\nNVN:  {neuron_config['nvn']}"
+    plt.text(0.0, -down_coordinate, annotation_string_con, size=11, transform=ax.transAxes, va="top", ha="left", bbox=annotation_box_config)
     for i, nt in enumerate(neuron_types):
-        if neuron_counts[nt]>0:
-            annotation_string=f"\n{nt}_GABA_TAU: {neuron_config[nt+'_GABA_TAU'][0]}|{neuron_config[nt+'_GABA_TAU'][1]}"
-            annotation_string+=f"\n{nt}_GABA_GAIN: {neuron_config[nt+'_GABA_GAIN'][0]}|{neuron_config[nt+'_GABA_GAIN'][1]}"
-            annotation_string+=f"\n{nt}_SHUNT_TAU: {neuron_config[nt+'_SHUNT_TAU'][0]}|{neuron_config[nt+'_SHUNT_TAU'][1]}"
-            annotation_string+=f"\n{nt}_SHUNT_GAIN: {neuron_config[nt+'_SHUNT_GAIN'][0]}|{neuron_config[nt+'_SHUNT_GAIN'][1]}"
-        if nt == 'PC':
-                annotation_string = f"{nt}_NMDA_TAU: {neuron_config[nt+'_NMDA_TAU'][0]}|{neuron_config[nt+'_NMDA_TAU'][1]}"
-                annotation_string  += f"\n{nt}_NMDA_GAIN: {neuron_config[nt+'_NMDA_GAIN'][0]}|{neuron_config[nt+'_NMDA_GAIN'][1]}"
-        plt.text(.12*(i+5), -.09, annotation_string, transform=ax.transAxes, va="top", ha="left", fontsize=8, bbox=annotation_box_config)
+            if neuron_counts[nt] > 0:
+                annotation_string = f"{nt}_W_0: {neuron_config[nt + '_W0'][0]}|{neuron_config[nt + '_W0'][1]}\n{nt}_W_1: {neuron_config[nt + '_W1'][0]}|{neuron_config[nt + '_W1'][1]}"
+                annotation_string += f"\n{nt}_W_2: {neuron_config[nt + '_W2'][0]}|{neuron_config[nt + '_W2'][1]}\n{nt}_W_3: {neuron_config[nt + '_W3'][0]}|{neuron_config[nt + '_W3'][1]}"
+
+                annotation_string += f"\n{nt}_gain: {neuron_config[nt + '_GAIN'][0]}|{neuron_config[nt + '_GAIN'][1]}\n{nt}_leak: {neuron_config[nt + '_LEAK'][0]}|{neuron_config[nt + '_LEAK'][1]}"
+                annotation_string += f"\n{nt}_ref: {neuron_config[nt + '_REF'][0]}|{neuron_config[nt + '_REF'][1]}\n{nt}_spk_thr: {neuron_config[nt + '_SPK_THR'][0]}|{neuron_config[nt + '_SPK_THR'][1]}"
+                
+                annotation_string += f"\n{nt}_ampa_tau: {neuron_config[nt + '_AMPA_TAU'][0]}|{neuron_config[nt + '_AMPA_TAU'][1]}\n{nt}_ampa_gain: {neuron_config[nt + '_AMPA_GAIN'][0]}|{neuron_config[nt + '_AMPA_GAIN'][1]}"
+                annotation_string += f"\n{nt}_gaba_tau: {neuron_config[nt + '_GABA_TAU'][0]}|{neuron_config[nt + '_GABA_TAU'][1]}\n{nt}_gaba_gain: {neuron_config[nt + '_GABA_GAIN'][0]}|{neuron_config[nt + '_GABA_GAIN'][1]}"
+                annotation_string += f"\n{nt}_shunt_tau: {neuron_config[nt + '_SHUNT_TAU'][0]}|{neuron_config[nt + '_SHUNT_TAU'][1]}\n{nt}_shunt_gain: {neuron_config[nt + '_SHUNT_GAIN'][0]}|{neuron_config[nt + '_SHUNT_GAIN'][1]}"
+                if nt == 'PC':
+                    annotation_string += f"\n{nt}_nmda_tau: {neuron_config[nt + '_NMDA_TAU'][0]}|{neuron_config[nt + '_NMDA_TAU'][1]}\n{nt}_nmda_gain: {neuron_config[nt + '_NMDA_GAIN'][0]}|{neuron_config[nt + '_NMDA_GAIN'][1]}"
+                    annotation_string_2 = f"{nt}_adaptation: {neuron_config[nt + '_Adaptation']}"
+                    annotation_string_2 += f"\n{nt}_pwtau: {neuron_config[nt + '_SOAD_PWTAU_N'][0]}|{neuron_config[nt + '_SOAD_PWTAU_N'][1]}"
+                    annotation_string_2 += f"\n{nt}_gain: {neuron_config[nt + '_SOAD_GAIN_P'][0]}|{neuron_config[nt + '_SOAD_GAIN_P'][1]}"
+                    annotation_string_2 += f"\n{nt}_tau: {neuron_config[nt + '_SOAD_TAU_P'][0]}|{neuron_config[nt + '_SOAD_TAU_P'][1]}"
+                    annotation_string_2 += f"\n{nt}_w: {neuron_config[nt + '_SOAD_W_N'][0]}|{neuron_config[nt + '_SOAD_W_N'][1]}"
+                    annotation_string_2 += f"\n{nt}_casc: {neuron_config[nt + '_SOAD_CASC_P'][0]}|{neuron_config[nt + '_SOAD_CASC_P'][1]}"
+                    plt.text(.15*4,-down_coordinate,annotation_string_2, transform=ax.transAxes, va="top", ha="left", fontsize=10, bbox=annotation_box_config)
+                if nt == 'PV': 
+                    annotation_string_3 = f"{nt}_STD: {neuron_config['STD']}"
+                    annotation_string_3 += f"\n{nt}_SYAM_STDW_N: {neuron_config['SYAM_STDW_N'][0]}|{neuron_config['SYAM_STDW_N'][1]}"
+                    annotation_string_3 += f"\n{nt}_SYAW_STDSTR_N: {neuron_config['SYAW_STDSTR_N'][0]}|{neuron_config['SYAW_STDSTR_N'][1]}"
+                    plt.text(.15*5,-down_coordinate,annotation_string_3, transform=ax.transAxes, va="top", ha="left", fontsize=10, bbox=annotation_box_config)
+                plt.text(.15*i+.12, -down_coordinate, annotation_string, transform=ax.transAxes, va="top", ha="left", fontsize=10, bbox=annotation_box_config)
+
          
     

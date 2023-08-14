@@ -34,7 +34,7 @@ def pc_pv_sst(board, profile_path, number_of_chips,neuron_config):
     time_label = str(datetime.datetime.now().hour)+"-"+str(datetime.datetime.now().minute)
     #tname= 'trail'
     tname = "PC,PV & SST Network"
-    dir_path = f"./data/{tname}/{date_label}"
+    dir_path=f"/home/hector/Documents/dynapse-se2-data/{tname}/{date_label}"
     config_path = f"{dir_path}/config"
     raster_path = f"{dir_path}/plots/rasters/{time_label}"
     plot_path = f"{dir_path}/plots"
@@ -56,12 +56,14 @@ def pc_pv_sst(board, profile_path, number_of_chips,neuron_config):
     set_latches(myConfig,model, neuron_config, number_of_chips)
     #||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
     # Set up network
+    print("Setting up network")
     network = Network(config=myConfig, profile_path=profile_path, num_chips=number_of_chips)
     input1 = network.add_virtual_group(size=neuron_config['nvn'])#normal input
     PC = network.add_group(chip=0, core=0, size=neuron_config['pcn'])
     PV = network.add_group(chip=0, core=1, size=neuron_config['pvn'])
     SST= network.add_group(chip=0, core=2, size=neuron_config['sstn'])
     #||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+    print('Adding connections')
     #Input Connections
     network.add_connection(source=input1, target=PC, probability=neuron_config['Input_PC'],
                       dendrite=Dendrite.ampa, weight=[True, False, False, False],repeat=1)
@@ -109,8 +111,9 @@ def pc_pv_sst(board, profile_path, number_of_chips,neuron_config):
     #Emulation run
     #Input event
     input_events=create_events(input1,neuron_config['nvn'],neuron_config,neuron_config['in_freq'])
+    print("Input events created")
     output_events=run_dynapse(neuron_config,board,input_events)
-
+    print("Simulation done")
  
     # /⅞save_config_axis1(test_config,myConfig,number_of_chips,tname)
     np.save(dir_path+"/pc_pv_s"+time_label,  output_events)
