@@ -257,7 +257,7 @@ def FF_single_iteration(model,board,myConfig,test_config,neuron_config,input1,in
     [cv_values,synchrony_values]=run_dynamic_anal(output_events,test_config)
     test_config['raster_title']='fI:'+str(in_Freq)
     if any(rates[nvn+1:pcn+nvn+pvn+sstn]>1):
-        script_annotated_raster_plot(test_config,output_events,neuron_config,cv_values=cv_values,syn_values=synchrony_values,save_mult=True,show=False,annotate=False)
+        script_annotated_raster_plot(test_config,output_events,neuron_config,cv_values=cv_values,syn_values=synchrony_values,save_mult=True,annotate=False)
         overtake=frequency_over_time(test_config,output_events)
     else:
         overtake=1

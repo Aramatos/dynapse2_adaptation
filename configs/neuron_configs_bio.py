@@ -16,7 +16,7 @@ def test_selection():
     return test_select
 
 
-def neuron_configs():
+def config():
     neuron_config={
         'input_type':'Regular',#regular, striated, or sweep
         #General Latch Settings
@@ -56,16 +56,16 @@ def neuron_configs():
         'pvn':10,        
         'sstn':10,
         #Probabilities
-        'Input_PC':.8,
-        'Input_PV':.1,
-        'Input_SST':.5,
+        'Input_PC':.3,
+        'Input_PV':.11,
+        'Input_SST':.1,
         'PC_PC':.2,
-        'PC_PV':.2,
-        'PC_SST':.05,
+        'PC_PV':.15,
+        'PC_SST':.3,
         'PV_PC':.2,
         'PV_PV':.2,
-        'PV_SST':.2,
-        'SST_PC':.6,
+        'PV_SST':.3,
+        'SST_PC':.3,
         'SST_PV':.2,
         #PC neuron parameters
         'PC_LEAK':[1,46],
@@ -92,10 +92,10 @@ def neuron_configs():
         'PC_SHUNT_TAU':[1,30],
         'PC_SHUNT_GAIN':[1,90],
         #PC Weights
-        'PC_W0':[4,150], #input
-        'PC_W1':[3,100], #recurrent PC tp PC
-        'PC_W2':[3,100], #PV shunt inhitbiton to PC
-        'PC_W3':[4,100], #SST shunt inhibition
+        'PC_W0':[4,100], #input
+        'PC_W1':[1,100], #recurrent PC tp PC
+        'PC_W2':[2,100], #PV shunt inhitbiton to PC
+        'PC_W3':[2,100], #SST shunt inhibition
         #||||||||||||||||||||||||||||||||||||||||||||||||||
         #PV neuron parameters
         'PV_LEAK':[1,90],
@@ -117,9 +117,9 @@ def neuron_configs():
         'SYAW_STDSTR_N':[0,10],
         #PV Weights 
         'PV_W0':[3,100], #input
-        'PV_W1':[3,100], # PC input
-        'PV_W2':[2,100], # PV gaba inhitbiton
-        'PV_W3':[4,100], # SST shunt inhibition
+        'PV_W1':[1,100], # PC input
+        'PV_W2':[4,250], # PV gaba inhitbiton
+        'PV_W3':[2,100], # SST shunt inhibition
         #||||||||||||||||||||||||||||||||||||||||||||||||||
         #SST neuron parameters
         'SST_LEAK':[1,44],
@@ -137,9 +137,9 @@ def neuron_configs():
         'SST_SHUNT_TAU':[1,30],
         'SST_SHUNT_GAIN':[1,90],
         #SST Weights
-        'SST_W0':[3,200], #input
-        'SST_W1':[3,100], #PC input
-        'SST_W2':[3,100], # pv gaba inhitbiton
+        'SST_W0':[4,100], #input
+        'SST_W1':[4,200], #PC input
+        'SST_W2':[2,100], # pv gaba inhitbiton
         'SST_W3':[0,0],# nothing is connected here
         }
     return neuron_config

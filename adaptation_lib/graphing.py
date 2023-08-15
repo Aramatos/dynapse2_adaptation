@@ -65,10 +65,10 @@ def script_annotated_raster_plot(test_config,output_events,neuron_config,cv_valu
     ax.text(0, 1.023, annotation_string, size =12, transform=ax.transAxes, va = "top", ha="left")
     #set input strenght annotation
     input_annotation = f'Input DC: 3,{in_DC} fine' if neuron_config['input_type'] == 'DC' else f'Input Freq: {in_freq} Hz'
-    ax.annotate(input_annotation, xy=(0.9, -0.03), xycoords='axes fraction', size=8, bbox=dict(boxstyle="round", fc="w"))
+    ax.annotate(input_annotation, xy=(0.9, -0.015), xycoords='axes fraction', size=8, bbox=dict(boxstyle="round", fc="w"))
     #set CV and Synaptic strength annotation
     if cv_values[0]!=404:
-        ax.annotate(f'CV: {cv_values[0]}|{cv_values[1]}|{cv_values[2]}',  xy=(0.9, -0.06), xycoords='axes fraction',size=8, bbox=dict(boxstyle="round", fc="w"))
+        ax.annotate(f'CV: {cv_values[0]}|{cv_values[1]}|{cv_values[2]}',  xy=(0.9, -0.012), xycoords='axes fraction',size=8, bbox=dict(boxstyle="round", fc="w"))
     if syn_values[0]!=404:
         ax.annotate(f'Syn: {syn_values[0]}|{syn_values[1]}|{syn_values[2]}', xy=(0.9, -0.09), xycoords='axes fraction' ,size=8, bbox=dict(boxstyle="round", fc="w"))
     ax.spines['right'].set_visible(False)
@@ -79,6 +79,7 @@ def script_annotated_raster_plot(test_config,output_events,neuron_config,cv_valu
     if annotate_network==True: 
         annotate_plot_network(neuron_types,neuron_counts,neuron_config,ax)
 
+    plt.tight_layout()
 
     if save_mult==True:
         raster_path=test_config['raster_path']
@@ -89,8 +90,7 @@ def script_annotated_raster_plot(test_config,output_events,neuron_config,cv_valu
     else:
         pass
 
-    plt.tight_layout()
-    plt.close
+    plt.close()
     
     return fig
 
@@ -501,7 +501,7 @@ def annotate_plot(neuron_types,neuron_counts,neuron_config,ax):
                     annotation_string_3 = f"{nt}_STD: {neuron_config['STD']}"
                     annotation_string_3 += f"\n{nt}_SYAM_STDW_N: {neuron_config['SYAM_STDW_N'][0]}|{neuron_config['SYAM_STDW_N'][1]}"
                     annotation_string_3 += f"\n{nt}_SYAW_STDSTR_N: {neuron_config['SYAW_STDSTR_N'][0]}|{neuron_config['SYAW_STDSTR_N'][1]}"
-                    plt.text(.12*4+.01,-.09,annotation_string_3, transform=ax.transAxes, va="top", ha="left", fontsize=8, bbox=annotation_box_config)
+                    plt.text(.12*3+.01,-.15,annotation_string_3, transform=ax.transAxes, va="top", ha="left", fontsize=8, bbox=annotation_box_config)
                 plt.text(.12*i, -.09, annotation_string, transform=ax.transAxes, va="top", ha="left", fontsize=8, bbox=annotation_box_config)
 
 

@@ -18,7 +18,6 @@ from lib.dynapse2_obj import *
 from adaptation_lib.spike_stats import *
 from adaptation_lib.dynapse_setup import *
 from adaptation_lib.graphing import *
-from configs.neuron_configs import neuron_configs
 import numpy as np
 import matplotlib as mp
 import datetime
@@ -28,7 +27,7 @@ import datetime
 board_names=["dev_board"]
 
 
-def ff_single_neurons(board, profile_path, number_of_chips,neuron_config=neuron_configs()):
+def ff_single_neurons(board, profile_path, number_of_chips):
    #||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
    #Auto_Save_set_up
    date_label = datetime.date.today().strftime('%Y-%m-%d')
