@@ -16,7 +16,6 @@ from lib.dynapse2_spikegen import get_fpga_time, send_virtual_events, poisson_ge
 from lib.dynapse2_raster import *
 from lib.dynapse2_obj import *
 from adaptation_lib.spike_stats import *
-from configs.neuron_configs import neuron_configs
 from adaptation_lib.dynapse_setup  import *
 import numpy as np
 import matplotlib as mp
@@ -28,25 +27,31 @@ board_names=["dev_board"]
 
 
 def pc_pv_sst(board, profile_path, number_of_chips,neuron_config):
-    #||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
-    #Auto_Save_set_up
+    # Determine the user's home directory
+    home_directory = os.path.expanduser("~")
+    # Path to the Documents directory
+    documents_path = os.path.join(home_directory, "Documents")
+    # Path to the dynapse-se2-data directory within Documents
+    base_path = os.path.join(documents_path, "dynapse-se2-data")
+    # Auto Save set up
     date_label = datetime.date.today().strftime('%Y-%m-%d')
-    time_label = str(datetime.datetime.now().hour)+"-"+str(datetime.datetime.now().minute)
-    #tname= 'trail'
+    time_label = str(datetime.datetime.now().hour) + "-" + str(datetime.datetime.now().minute)
+    # tname= 'trail'
     tname = "PC,PV & SST Network"
-    dir_path=f"/home/hector/Documents/dynapse-se2-data/{tname}/{date_label}"
-    config_path = f"{dir_path}/config"
-    raster_path = f"{dir_path}/plots/rasters/{time_label}"
-    plot_path = f"{dir_path}/plots"
-    os.makedirs(f"{config_path}",exist_ok=True)
-    os.makedirs(f"{plot_path}",exist_ok=True)
+    # Constructing the necessary paths
+    dir_path = os.path.join(base_path, tname, date_label)
+    config_path = os.path.join(dir_path, "config")
+    raster_path = os.path.join(dir_path, "plots", "rasters", time_label)
+    plot_path = os.path.join(dir_path, "plots")
+    # Creating the directories if they don't exist
+    os.makedirs(config_path, exist_ok=True)
+    os.makedirs(plot_path, exist_ok=True)
     #||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
     #Initialization
     model = board.get_model()
     model.reset(ResetType.PowerCycle, (1 << number_of_chips) - 1)
     time.sleep(1)
     myConfig = model.get_configuration()
-
     model.apply_configuration(myConfig)
     time.sleep(1)
     #||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
@@ -114,7 +119,6 @@ def pc_pv_sst(board, profile_path, number_of_chips,neuron_config):
     print("Input events created")
     output_events=run_dynapse(neuron_config,board,input_events)
     print("Simulation done")
- 
     # /⅞save_config_axis1(test_config,myConfig,number_of_chips,tname)
     np.save(dir_path+"/pc_pv_s"+time_label,  output_events)
     # /⅞print("time label: "+str(time_label))

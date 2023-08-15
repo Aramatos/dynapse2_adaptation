@@ -17,7 +17,7 @@ from lib.dynapse2_raster import *
 from lib.dynapse2_obj import *
 from adaptation_lib.spike_stats import *
 from adaptation_lib.dynapse_setup import *
-from configs.neuron_configs import neuron_configs
+from dynapse2_adaptation.configs.neuron_configs_bio import neuron_configs
 import numpy as np
 import matplotlib as mp
 import datetime

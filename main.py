@@ -14,7 +14,7 @@ from test import test_neurons, test_routing, test_synapses, test_homeostasis, te
 from measure import meas_syn_tau
 from example import wta, perceptron, stp, stdp, stdp_mp, parietal
 from adaptation import  ff_network, pc_pv_sst, pc_pv,pc_single,pv_single,ff_pc_pv,ff,sst_single,pc_pv_de,time_constants
-from configs.neuron_configs import test_selection
+from dynapse2_adaptation.configs.neuron_configs_bio import test_selection
 
 import os
 
@@ -39,7 +39,7 @@ def main():
     if len(args) == 2:
         number_of_chips = int(args[1])
     else:
-        number_of_chips = 1
+        number_of_chips = 1 
 
     # receiver_endpoint = "tcp://0.0.0.0:33335"
     # sender_endpoint = "tcp://0.0.0.0:33336"
