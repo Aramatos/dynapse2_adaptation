@@ -483,7 +483,7 @@ def sweep_run(neuron_config,myConfig,model,test_config,input1,board):
         decay_grap(sweep_range,sweep_decay_output,sweep_variable,test_config)
         np.save(test_config['dir_path']+"/pc_decay_"+test_config['time_label'],  sweep_decay_output)
 
-def config_handshake(neuron_config,nvn,pvn,pcn,sstn,time_label,dir_path,config_path,plot_path,date_label,raster_path,tname):
+def config_handshake(neuron_config,time_label,dir_path,config_path,plot_path,date_label,raster_path,tname):
     
     test_config={'duration':neuron_config['duration'],
              'in_DC':neuron_config['in_DC'],
@@ -492,7 +492,10 @@ def config_handshake(neuron_config,nvn,pvn,pcn,sstn,time_label,dir_path,config_p
              'sweep_variable':neuron_config['sweep_variable'],
              'sweep_coarse_val':neuron_config['sweep_coarse_val'],
              'sweep_range_fine':neuron_config['sweep_range_fine'],
-             'nvn':nvn,'pvn':pvn,'pcn':pcn,'sstn':sstn,
+             'nvn':neuron_config['nvn'],
+             'pvn':neuron_config['pvn'],
+             'pcn':neuron_config['pcn'],
+             'sstn':neuron_config['sstn'],
              'time_label':time_label,
              'dir_path':dir_path,
              'config_path':config_path,

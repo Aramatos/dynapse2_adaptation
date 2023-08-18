@@ -359,11 +359,13 @@ def frequency_vs_time_plot(fot_output,test_config,save=False,annotate=False,show
     ax.set_title(f'Frequeny vs Time')
     plt.figtext(0.7, 0.15,'Input Freq: '+str(test_config['in_freq'])+' Hz', size=9,bbox=dict(boxstyle="round", fc="w"))
     ax.legend()
+    annotation_string = f"ts: {test_config['date_label']}-{test_config['time_label']}"
+    ax.text(0, 1.023, annotation_string, size =12, transform=ax.transAxes, va = "top", ha="left")
     # Remove top and right spines
     ax.spines['right'].set_visible(False)
     ax.spines['top'].set_visible(False)
     if save==True:
-        plt.savefig(test_config['plot_path']+"/FvT_"+test_config['time_label']+".svg")
+        plt.savefig(test_config['plot_path']+"/FvT_"+test_config['time_label']+".png")
     else:
         pass
     plt.close()

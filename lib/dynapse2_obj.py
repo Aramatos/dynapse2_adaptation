@@ -27,7 +27,15 @@ class AerConstructor:
     def __init__(self, destination, timestamp):
         self.aer = NormalGridEvent()
         self.aer.event = destination
-        self.aer.timestamp = timestamp
+
+        try:
+            self.aer.timestamp = timestamp
+        except TypeError as e:
+            print("Error occurred while setting timestamp:")
+            print("Destination:", destination)
+            print("Timestamp:", timestamp)
+            print("Exception:", e)
+            raise  # Re-raise the exception to propagate it further
 
 
 class VirtualSpikeConstructor:

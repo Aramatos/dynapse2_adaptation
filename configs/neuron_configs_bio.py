@@ -51,9 +51,9 @@ def config():
         'DC_FI_Range':np.linspace(0,250,10,dtype=int),
         'Freq_FI_Range:':np.linspace(0,250,10,dtype=int),
         #population size
-        'nvn':10,
-        'pcn':80,
-        'pvn':10,        
+        'nvn':15,
+        'pcn':100,
+        'pvn':20,        
         'sstn':10,
         #Probabilities
         'Input_PC':.3,
@@ -64,7 +64,7 @@ def config():
         'PC_SST':.3,
         'PV_PC':.2,
         'PV_PV':.2,
-        'PV_SST':.3,
+        'PV_SST':.2,
         'SST_PC':.3,
         'SST_PV':.2,
         #PC neuron parameters
@@ -139,7 +139,7 @@ def config():
         #SST Weights
         'SST_W0':[4,100], #input
         'SST_W1':[4,200], #PC input
-        'SST_W2':[2,100], # pv gaba inhitbiton
+        'SST_W2':[0,50], # pv gaba inhitbiton
         'SST_W3':[0,0],# nothing is connected here
         }
     return neuron_config

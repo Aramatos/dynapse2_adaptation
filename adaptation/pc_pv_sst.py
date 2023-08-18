@@ -55,7 +55,8 @@ def pc_pv_sst(board, profile_path, number_of_chips,neuron_config):
     model.apply_configuration(myConfig)
     time.sleep(1)
     #||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
-    test_config=config_handshake(neuron_config,neuron_config['nvn'],neuron_config['pvn'],neuron_config['pcn'],neuron_config['sstn'],time_label,dir_path,config_path,plot_path,date_label,raster_path,tname)
+    print(neuron_config)
+    test_config=config_handshake(neuron_config,time_label,dir_path,config_path,plot_path,date_label,raster_path,tname)
     #||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
     # set neuron latches
     set_latches(myConfig,model, neuron_config, number_of_chips)
