@@ -299,32 +299,7 @@ def pop_rates(rates,test_config,show=False):
 
 
     return [PC_rates,PV_rates,SST_rates]
-
-
-
-def bias_set(number):
-    if (number>0)&(number<=1):
-        coarse=0
-        fine=((number*256)/(8**0))
-    elif (number>1)&(number<=8):
-        coarse=1
-        fine=((number*256)/(8**1))
-    elif (number>8)&(number<=64):
-        coarse=2
-        fine=((number*256)/(8**2))
-    elif (number>64)&(number<=512):
-        coarse=3
-        fine=((number*256)/(8**3))
-    elif (number>512)&(number<=4096):
-        coarse=4
-        fine=((number*256)/(8**4))
-    elif (number>4096)&(number<=32768):
-        coarse=5
-        fine=((number*256)/(8**5))
-    else:
-        print("number goes outside of bounds")
-        pass
-    return coarse,int(fine)  
+ 
 
 def set_configs(myConfig,model,neuron_config):
    # PC neuron parameters
