@@ -31,7 +31,6 @@ def simple_raster_plot(output_events,dir_path,time_label,plot_name,show=False):
 
 def script_annotated_raster_plot(test_config,output_events,neuron_config,cv_values=[404,404,404],syn_values=[404,404,404],save=False,save_mult=False,annotate=False,annotate_network=False):
     neuron_types = ['PC', 'PV', 'SST']
-    colors = {'PC': 'b', 'PV': 'r', 'SST': 'orange'}
     neuron_counts = {nt: test_config[nt.lower() + 'n'] for nt in neuron_types}
     test_config_keys = ['nvn', 'pcn', 'pvn', 'sstn', 'time_label', 'plot_path', 'in_freq', 'in_DC']
     nvn, pcn, pvn, sstn, time_label, plot_path, in_freq, in_DC = (test_config[key] for key in test_config_keys)
@@ -84,9 +83,9 @@ def script_annotated_raster_plot(test_config,output_events,neuron_config,cv_valu
     if save_mult==True:
         raster_path=test_config['raster_path']
         raster_title=test_config['raster_title']
-        plt.savefig(raster_path+"/"+raster_title+"_"+time_label+".svg")
+        plt.savefig(raster_path+"/"+raster_title+"_"+time_label+".png")
     elif save==True:
-        plt.savefig(plot_path+"/Net_Raster_"+time_label+".svg")
+        plt.savefig(plot_path+"/Net_Raster_"+time_label+".png")
     else:
         pass
 
@@ -346,9 +345,11 @@ def sweep_frequency_vs_time_plot(sweep_rates_output, test_config):
     plt.savefig(f"{test_config['plot_path']}/FVT{test_config['time_label']}.svg", bbox_inches="tight")
     plt.show()
 
-def frequency_vs_time_plot(fot_output,test_config,save=False,annotate=False,show=False):
+def frequency_vs_time_plot(fot_output,test_config,save=False,annotate=False,neuron_config=[]):
     '''I am a docstring'''
     plt.style.use('seaborn-white')
+    neuron_types = ['PC', 'PV', 'SST']
+    neuron_counts = {nt: test_config[nt.lower() + 'n'] for nt in neuron_types}
 
     fig, ax = plt.subplots(figsize=(12,8) if annotate else (12,8))
     ax.plot(fot_output[0],fot_output[1][0:len(fot_output[0])],c='cadetblue',label=' PC_neurons')
@@ -364,11 +365,19 @@ def frequency_vs_time_plot(fot_output,test_config,save=False,annotate=False,show
     # Remove top and right spines
     ax.spines['right'].set_visible(False)
     ax.spines['top'].set_visible(False)
+
+    if annotate==True:        
+        annotate_plot_network(neuron_types,neuron_counts,neuron_config,ax)
+
+    plt.tight_layout()
     if save==True:
         plt.savefig(test_config['plot_path']+"/FvT_"+test_config['time_label']+".png")
     else:
         pass
+
+
     plt.close()
+
     
     return fig
     
