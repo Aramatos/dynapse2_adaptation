@@ -31,6 +31,40 @@ from scipy.signal import butter, filtfilt
 
 board_names=["dev_board"]
 
+def delayed_time_constant_exponential(x, A, tau, C, t0):
+    # x: Independent variable (time)
+    # A: Steady-state value
+    # tau: Time constant, determining how quickly the function approaches the steady state
+    # C: Initial value
+    # t0: Time at which the increase starts
+    # The function returns the initial value C for x < t0, and an exponential increase towards A for x >= t0
+    return np.where(x < t0, C, C + (A - C) * (1 - np.exp(-(x - t0) / tau)))
+
+def fit_frequency_over_time(time, frequency):
+    """
+    Fits the delayed time constant exponential increase function to the given frequency over time data.
+
+    Parameters:
+    time (array-like): Time data
+    frequency (array-like): Frequency over time data
+
+    Returns:
+    params (array): Fitted parameters [A, tau, C, t0]
+    A: Steady-state value
+    tau: Time constant
+    C: Initial value
+    t0: Time at which the increase starts
+    """
+    # Define bounds for the parameters (A, tau, C, t0)
+    # You can adjust these bounds as needed
+    bounds = ([0, 0, 0, 0], [np.inf, np.inf, np.inf, np.inf])
+
+    # Fit the function to the data using SciPy's curve_fit
+    # The fitted parameters are returned in the params array
+    params, covariance = curve_fit(delayed_time_constant_exponential, time, frequency, bounds=bounds)
+
+    return params
+
 def change_synapse_leak(myConfig,test_type,model,core_to_measure,coarse,fine):
     #input_events=regular_gen(input_neuron,1,10,1)
     if test_type=='AMPA':
