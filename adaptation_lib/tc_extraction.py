@@ -284,7 +284,7 @@ def pulse_osc_measurement(board,number_of_chips,neuron_config,duration=6,frequen
 
 from scipy.signal import savgol_filter
 
-def time_constant_extraction(data, output='tc', beta=1/26, cut_off=15, window_length=51, polyorder=3):
+def time_constant_extraction(data, output='tc', beta=1/26, cut_off=15, window_length=51, polyorder=3,show=False):
     raw_voltage=data[0]*1000
     raw_time=data[1]
 
@@ -342,7 +342,6 @@ def time_constant_extraction(data, output='tc', beta=1/26, cut_off=15, window_le
         return I_mem, time_decay  
     elif output== 'analysis': 
         graph_time_constant_analysis(params, raw_time, raw_voltage, time_masked, voltage_filtered, derivative, decay_threshold, decay_start_index, time_decay, I_mem)   
-        
     elif output == 'tc':
         return params[1]
 
@@ -408,10 +407,10 @@ def graph_time_constant_analysis(params_2,raw_time,raw_voltage,time_masked,volta
     ax5.set_ylabel('I_mem (nA)')
     ax5.spines['right'].set_visible(False)
     ax5.spines['top'].set_visible(False)
-    ax5.set_title('I_mem vs time fitted')
+    ax5.set_title('Membrane Current with exponential fit')
     ax5.legend(bbox_to_anchor=(.5, 1), loc='upper left',fontsize=13)
     ax5.grid(True)
-    plt.text(.77, .5, r'$I_{mem}=I_{0} \times e^{V_{mem}*\beta}$', fontsize=17,
+    plt.text(.77, .5, r'$I_{mem}=I_{0} \times e^{V_{mem}*\frac{\kappa}{U_TS}}$', fontsize=17,
          bbox=dict(facecolor='white', edgecolor='black', boxstyle='round,pad=1'),
          transform=plt.gca().transAxes)
     # Show the plot
