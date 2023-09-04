@@ -49,12 +49,6 @@ def send_events(board, events, min_delay=0):
 def send_virtual_events(board, virtual_events, offset=0, min_delay=0):
     input_events = []
     for event in virtual_events:
-        timestamp = event[3] + offset
-        if timestamp > 4294967295:
-            print("Warning: Timestamp out of bounds!")
-            print("Event:", event)
-            print("Offset:", offset)
-            print("Timestamp:", timestamp)
         input_events += [AerConstructor(
             destination=DestinationConstructor(tag=event[0], core=[True]*4, x_hop=-7).destination,
             timestamp=event[3] + offset).aer] + \
@@ -63,6 +57,7 @@ def send_virtual_events(board, virtual_events, offset=0, min_delay=0):
                                 tag=event[1], core=[event[2][1] & 1 << core > 0 for core in range(4)],
                                 x_hop=event[2][0]).destination,
                             timestamp=event[3] + offset).aer]
+      
     if len(virtual_events) > 0:
         ts = input_events[-1].timestamp
     else:

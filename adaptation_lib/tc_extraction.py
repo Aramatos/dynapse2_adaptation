@@ -21,7 +21,7 @@ from lib.dynapse2_obj import *
 from adaptation_lib.spike_stats import *
 from adaptation_lib.dynapse_setup import *
 from adaptation_lib.graphing import *
-from dynapse2_adaptation.configs.neuron_configs_bio import neuron_configs
+from configs import neuron_configs_bio
 import numpy as np
 import matplotlib as mp
 import datetime
@@ -185,6 +185,16 @@ def custom_relu(x, start_rise, slope, saturation):
 
 
 def spike_osc_measurement(board,input_events,duration=6):
+
+    # the following code sends input events and runs the dynapse with the epsp_spike function.
+    # to make this code run the following must be done:
+    # 1. obtain the Diligent Waveforms SDK (it is included with the waveforms software, download the adept software too)
+    # 2. After the SDK is installed, grab the dwfconstants.py file and put it in your working directory
+    # 3. In the gettings started section of the SDK, the first command obtains the libraries required (in OS,Windows and Linux)
+    #    For Linux it probably wont work and this will cause an error with any continuing attempts at calling the dwf package.
+    #    Please install libudev0, as it is required for it to run. 
+    #       sudo apt-get update
+    #       sudo apt-get install libudev0
     # Define constants
     CHANNEL = 0  # Use first channel
     FREQUENCY = 1200.0  # Sampling frequency

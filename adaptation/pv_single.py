@@ -17,8 +17,6 @@ from lib.dynapse2_raster import *
 from lib.dynapse2_obj import *
 from adaptation_lib.spike_stats import *
 from adaptation_lib.dynapse_setup import *
-from dynapse2_adaptation.configs.neuron_configs_bio import neuron_configs
-
 import numpy as np
 import matplotlib as mp
 import datetime
@@ -28,7 +26,7 @@ import datetime
 board_names=["dev_board"]
 
 
-def pv_single(board, profile_path, number_of_chips):
+def pv_single(board, profile_path, number_of_chips,neuron_config):
     #||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
     #Auto_Save_set_up
     date_label = datetime.date.today().strftime('%Y-%m-%d')
@@ -56,7 +54,6 @@ def pv_single(board, profile_path, number_of_chips):
     pvn=200
     pcn=0
     sstn=0
-    neuron_config=neuron_configs()
     in_freq=neuron_config['in_freq']
     in_DC=neuron_config['in_DC']
     duration=neuron_config['duration']
@@ -113,7 +110,7 @@ def pv_single(board, profile_path, number_of_chips):
         plot_psth(test_config,spike_times_pvn, bin_size=0.100)
         #FOT
         fot_output=frequency_over_time(test_config,output_events)
-        graph_frequency_over_time(fot_output,test_config,save=False,show=True)
+        frequency_vs_time_plot(fot_output,test_config,save=False,annotate=False,show=False)
         np.save(test_config['dir_path']+"/pc_"+test_config['time_label'],  output_events)
     #||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
     #Data aquisitons and plots

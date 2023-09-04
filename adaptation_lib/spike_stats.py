@@ -14,6 +14,13 @@ import matplotlib.patches as patches
 import matplotlib.lines as lines
 import matplotlib.ticker as ticker
 import matplotlib.colors as colors
+from scipy.stats import linregress
+
+
+
+def calculate_slope(time_axis, ff_windows_sst):
+    slope, intercept, r_value, p_value, std_err = linregress(time_axis, ff_windows_sst)
+    return slope
 
 def weighted_moving_average(signal, times, window_size):
     """

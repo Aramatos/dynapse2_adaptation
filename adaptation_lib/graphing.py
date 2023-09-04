@@ -520,7 +520,7 @@ def annotate_plot(neuron_types,neuron_counts,neuron_config,ax):
 def annotate_plot_network(neuron_types,neuron_counts,neuron_config,ax):
     down_coordinate=.15
     annotation_box_config = dict(boxstyle="round", fc="w")
-    annotation_string_con=f"Connections:"
+    annotation_string_con = "Connections:"
     annotation_string_con += f"\nIn_PC:  {neuron_config['Input_PC']}"
     annotation_string_con += f"\nIn_PV:  {neuron_config['Input_PV']}"
     annotation_string_con += f"\nIn_SST:  {neuron_config['Input_SST']}"

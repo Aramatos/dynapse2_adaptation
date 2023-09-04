@@ -17,7 +17,6 @@ from lib.dynapse2_raster import *
 from lib.dynapse2_obj import *
 from adaptation_lib.spike_stats import *
 from adaptation_lib.dynapse_setup import *
-from dynapse2_adaptation.configs.neuron_configs_bio import neuron_configs
 
 import numpy as np
 import matplotlib as mp
@@ -28,7 +27,7 @@ import datetime
 board_names=["dev_board"]
 
 
-def ff_pc_pv(board, profile_path, number_of_chips):
+def ff_pc_pv(board, profile_path, number_of_chips,neuron_config):
    #||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
    #Auto_Save_set_up
    date_label = datetime.date.today().strftime('%Y-%m-%d')
@@ -55,7 +54,6 @@ def ff_pc_pv(board, profile_path, number_of_chips):
    pvn=10
    pcn=80
    sstn=0
-   neuron_config=neuron_configs()
    in_freq=neuron_config['in_freq']
    in_DC=neuron_config['in_DC']
    test_config={'in_DC':in_DC,'tname':tname,'in_freq':in_freq,'nvn':nvn,'pvn':pvn,'pcn':pcn,'sstn':sstn,'time':time_label,'config_path':config_path,'plot_path':plot_path,'date_label':date_label,'raster_path':raster_path}   #||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||

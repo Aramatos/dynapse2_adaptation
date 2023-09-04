@@ -144,6 +144,18 @@ def run_dynapse(neuron_config,board,input_events):
       min_delay=10000
     print("\ngetting fpga time\n")
     ts = get_fpga_time(board=board) + 100000
+    while True:
+        ts = get_fpga_time(board=board)  # get current time of FPGA
+
+        if ts < 2**31:
+            break  # Exit the loop if ts is within the allowed range
+        
+        time.sleep(20)  # Pause for 20 seconds
+        print(f'new ts value: {ts}')    
+
+    # Assuming you wanted to add 0.2 to ts; make sure to convert ts to float if it's not
+    ts = float(ts) + 0.2e6
+
     print("\nsetting virtual neurons\n")
     send_virtual_events(board=board, virtual_events=input_events, offset=int(ts), min_delay=int(min_delay))
     output_events = [[], []]

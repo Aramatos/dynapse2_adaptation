@@ -55,7 +55,6 @@ def pc_pv_sst(board, profile_path, number_of_chips,neuron_config):
     model.apply_configuration(myConfig)
     time.sleep(1)
     #||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
-    print(neuron_config)
     test_config=config_handshake(neuron_config,time_label,dir_path,config_path,plot_path,date_label,raster_path,tname)
     #||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
     # set neuron latches
@@ -103,14 +102,6 @@ def pc_pv_sst(board, profile_path, number_of_chips,neuron_config):
     set_monitors(myConfig,model,test_config,PC=PC,PV=PV,SST=SST)
     #||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
     set_configs(myConfig,model,neuron_config)
-    #///////////////////////////////////////////////////////////////////////////////////
-    #Pre simulation data
-    print("\nPC Neurons\n")
-    print(PC.neurons)
-    print("\nPV Neurons\n")
-    print(PV.neurons)
-    print("\nPV Neurons\n")
-    print(SST.neurons)
     #||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
     print("\nAll configurations done!\n")
     #||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
