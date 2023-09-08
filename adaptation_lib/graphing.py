@@ -11,7 +11,7 @@ from matplotlib import cm
 # Raster Plots
 ##############
 
-def simple_raster_plot(output_events,dir_path,time_label,plot_name,show=False):
+def simple_raster_plot(output_events,show=True):
     # raster plot
     raster = [[] for _ in range(max(output_events[0]) + 1)]
     for i in range(len(output_events[0])):
@@ -22,7 +22,6 @@ def simple_raster_plot(output_events,dir_path,time_label,plot_name,show=False):
     plt.grid(True)
     plt.ylabel('Neuron ID')
     #plt.savefig(dir_path+"/"+plot_name+"_"+time_label)
-    plt.savefig(dir_path+"/"+plot_name+"_"+time_label+".svg")
 
     if show==True:
         plt.show()
