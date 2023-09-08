@@ -134,7 +134,7 @@ def run_dynapse(neuron_config,board,input_events):
     print('initilize run dynapse')
     output_events = [[], []]
     send_virtual_events(board=board, virtual_events=[],min_delay=10000)
-    print('initilize run dynapse')
+    print('dummy events sent')
     get_events(board=board, extra_time=100, output_events=output_events)
     if neuron_config['input_type']=='DC':
       min_delay=neuron_config['duration']*1e6
