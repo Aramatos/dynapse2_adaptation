@@ -66,9 +66,9 @@ def script_annotated_raster_plot(test_config,output_events,neuron_config,cv_valu
     ax.annotate(input_annotation, xy=(0.9, -0.015), xycoords='axes fraction', size=8, bbox=dict(boxstyle="round", fc="w"))
     #set CV and Synaptic strength annotation
     if cv_values[0]!=404:
-        ax.annotate(f'CV: {cv_values[0]}|{cv_values[1]}|{cv_values[2]}',  xy=(0.9, -0.012), xycoords='axes fraction',size=8, bbox=dict(boxstyle="round", fc="w"))
+        ax.annotate(f'CV: {cv_values[0]}|{cv_values[1]}|{cv_values[2]}',  xy=(0.9, -0.112), xycoords='axes fraction',size=8, bbox=dict(boxstyle="round", fc="w"))
     if syn_values[0]!=404:
-        ax.annotate(f'Syn: {syn_values[0]}|{syn_values[1]}|{syn_values[2]}', xy=(0.9, -0.09), xycoords='axes fraction' ,size=8, bbox=dict(boxstyle="round", fc="w"))
+        ax.annotate(f'Syn: {syn_values[0]}|{syn_values[1]}|{syn_values[2]}', xy=(0.9, -0.19), xycoords='axes fraction' ,size=8, bbox=dict(boxstyle="round", fc="w"))
     ax.spines['right'].set_visible(False)
     ax.spines['top'].set_visible(False)
     
@@ -373,10 +373,7 @@ def frequency_vs_time_plot(fot_output,test_config,save=False,annotate=False,neur
         plt.savefig(test_config['plot_path']+"/FvT_"+test_config['time_label']+".png")
     else:
         pass
-
-
     plt.close()
-
     
     return fig
     
