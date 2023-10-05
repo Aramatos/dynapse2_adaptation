@@ -164,6 +164,21 @@ def frequency_arrays(output_events, test_config):
                             sstn_time_list.append(ocurrence_times)
     return pc_ff_list, pc_time_list, pvn_ff_list, pvn_time_list, sstn_ff_list, sstn_time_list
 
+def extract_isi(spike_id,spike_times):
+    isi_list=[]
+    isi_times=[]
+    for i in np.unique(spike_id):  
+        occurences=spike_times[spike_id==i]
+        if len(occurences)>0:
+            isi=np.diff(occurences)
+            if(isi==0).any():
+                print('isi=0')
+                print(occurences)
+            isi_list.append(isi)
+            isi_times.append(occurences[:-1])
+        
+    return isi_list,isi_times
+
 
 def split_spike_indices_by_window(times, indices, window_size:int, total_duration:int):
 	"""
@@ -272,7 +287,7 @@ def analysis_error(test_config,cv_values,synchrony_values):
 
 def frequency_over_time(test_config,output_events):
     '''
-    This function calculates the firing frequency of each neuron ggroup over time as ana everage over bin times
+    This function calculates the firing frequency over time for each neuron using windows
 
     '''
     nvn=test_config['nvn']
@@ -383,7 +398,7 @@ def psth_calc(spike_times, bin_size=0.011,duration=1):
     return psth, bins
     
 
-def spike_time_arrays(output_events,nvn=0,pvn=0,pcn=0,sstn=0):
+def spike_time_arrays(output_events,nvn=0,pcn=0,pvn=0,sstn=0):
     output_events=np.asanyarray(output_events)
     spike_times_all=output_events[1]-output_events[1][0]
     neuron_indexes=output_events[0]

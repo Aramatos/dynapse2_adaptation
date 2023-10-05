@@ -63,12 +63,12 @@ def script_annotated_raster_plot(test_config,output_events,neuron_config,cv_valu
     ax.text(0, 1.023, annotation_string, size =12, transform=ax.transAxes, va = "top", ha="left")
     #set input strenght annotation
     input_annotation = f'Input DC: 3,{in_DC} fine' if neuron_config['input_type'] == 'DC' else f'Input Freq: {in_freq} Hz'
-    ax.annotate(input_annotation, xy=(0.9, -0.015), xycoords='axes fraction', size=8, bbox=dict(boxstyle="round", fc="w"))
+    ax.annotate(input_annotation, xy=(.85, 0.0200), xycoords='axes fraction', size=10, bbox=dict(boxstyle="round", fc="w"))
     #set CV and Synaptic strength annotation
     if cv_values[0]!=404:
-        ax.annotate(f'CV: {cv_values[0]}|{cv_values[1]}|{cv_values[2]}',  xy=(0.9, -0.112), xycoords='axes fraction',size=8, bbox=dict(boxstyle="round", fc="w"))
+        ax.annotate(f'CV: {cv_values[0]}|{cv_values[1]}|{cv_values[2]}',  xy=(0.8, -0.32), xycoords='axes fraction',size=10, bbox=dict(boxstyle="round", fc="w"))
     if syn_values[0]!=404:
-        ax.annotate(f'Syn: {syn_values[0]}|{syn_values[1]}|{syn_values[2]}', xy=(0.9, -0.19), xycoords='axes fraction' ,size=8, bbox=dict(boxstyle="round", fc="w"))
+        ax.annotate(f'Syn: {syn_values[0]}|{syn_values[1]}|{syn_values[2]}', xy=(0.8, -0.4), xycoords='axes fraction' ,size=10, bbox=dict(boxstyle="round", fc="w"))
     ax.spines['right'].set_visible(False)
     ax.spines['top'].set_visible(False)
     
