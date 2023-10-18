@@ -452,7 +452,7 @@ def measure_spike(board,input_events,duration=1,frequency=3000):
         analog_instrument.close()
         return time_values,samples
     
-def measure_pulse(myConfig,model,duration=1):
+def measure_pulse(myConfig,model,duration=1,pulse_config=[3,250]):
     # Define constants
     CHANNEL = 0  # Use first channel
     FREQUENCY = 3000.0  # Sampling frequency
@@ -473,7 +473,7 @@ def measure_pulse(myConfig,model,duration=1):
         analog_instrument.configure(False, True)
         time.sleep(.02)
         # Start another function in a separate thread
-        threading.Thread(pulse(myConfig,model)).start()
+        threading.Thread(pulse(myConfig,model,pulse_config)).start()
         # Wait until the acquisition is done
         while True:
             if analog_instrument.status(True) == dwf.DwfStateDone:
@@ -488,10 +488,10 @@ def measure_pulse(myConfig,model,duration=1):
         analog_instrument.close()
         return time_values,samples
     
-def pulse(myConfig,model):
+def pulse(myConfig,model,pulse_config=[3,250]):
     # set neuron latches to get DC input
     print("\nAll configurations done!\n")
-    set_DC_parameter(myConfig,model,3,250)
+    set_DC_parameter(myConfig,model,pulse_config[0],pulse_config[1])
     time.sleep(.6)
     set_DC_parameter(myConfig,model, 0, 0)
     time.sleep(3)
