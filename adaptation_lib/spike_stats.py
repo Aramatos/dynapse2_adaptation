@@ -409,7 +409,7 @@ def spike_time_arrays(output_events,nvn=0,pcn=0,pvn=0,sstn=0):
     spike_times_pvn=spike_times[nvn:nvn+pvn]
     spike_times_pcn=spike_times[nvn+pvn:nvn+pvn+pcn]
     spike_times_sstn=spike_times[nvn+pvn+pcn:nvn+pvn+pcn+sstn]
-    return spike_times_nvn,spike_times_pvn,spike_times_pcn,spike_times_sstn
+    return spike_times_nvn,spike_times_pcn,spike_times_pvn,spike_times_sstn
 
 def spike_time_array(output_events, nvn, pvn, pcn, sstn, neuron_type):
     # Convert input to numpy array
