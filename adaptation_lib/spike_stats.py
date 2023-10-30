@@ -57,7 +57,7 @@ def run_sweep(sweep_range_1, sweep_range_2, config_var_name_1, config_var_name_2
     for value_1 in simulation_data[config_var_name_1]:
         neuron_config[config_var_name_1] = value_1
         for value_2 in simulation_data[config_var_name_2]:
-            if contains_nan(value_1, value_2):
+            if contains_nan(simulation_data,config_var_name_1,config_var_name_2,value_1, value_2):
                 neuron_config[config_var_name_2] = value_2
                 try:
                     [output_events, test_config] = run_simulation(neuron_config)
