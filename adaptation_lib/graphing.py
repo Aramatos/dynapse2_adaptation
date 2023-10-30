@@ -558,4 +558,63 @@ def annotate_plot_network(neuron_types,neuron_counts,neuron_config,ax):
                 plt.text(.15*i+.12, -down_coordinate, annotation_string, transform=ax.transAxes, va="top", ha="left", fontsize=10, bbox=annotation_box_config)
 
          
+def plot_network_raster_psth(raster_data,duration, bin_size):
+
+    pc_id=raster_data['pc_id']
+    pc_times=raster_data['pc_times']
+    pv_id=raster_data['pv_id']
+    pv_times=raster_data['pv_times']
+    sst_id=raster_data['sst_id']
+    sst_times=raster_data['sst_times']
+    input_id=raster_data['input_id']
+    input_time=raster_data['input_time']
     
+    # Font size controls
+    global_font_size = 16  # Change this to control font sizes
+    legend_font_size = global_font_size - 4
+    legend_title_font_size = global_font_size - 6
+
+    # Plotting
+    fig, axs = plt.subplots(2, 1, figsize=(10, 10), sharex=True, dpi=300)  # Increase DPI
+    ax1 = axs[0]
+    ax2 = axs[1]
+
+    # Raster plot
+    ax1.scatter(pc_times, pc_id, c='cadetblue', s=4, label='PC')
+    ax1.scatter(pv_times, pv_id, c='lightcoral', s=4, label='PV')
+    ax1.scatter(sst_times, sst_id, c='sandybrown', s=4, label='SST')
+    ax1.scatter(input_time, input_id, c='k', s=1, label='input')
+
+    ax1.set_ylabel('Neuron Indices', fontsize=global_font_size)
+    ax1.legend(loc="upper right", title='Neuron Type', numpoints=1, fontsize=legend_font_size, markerscale=3, title_fontsize=legend_title_font_size, frameon=True)
+    ax1.spines['right'].set_visible(False)
+    ax1.spines['top'].set_visible(False)
+    ax1.set_xlim(0, duration)
+
+    # PSTH plots
+    neuron_spikes = [pc_times, pv_times, sst_times]
+    colors = [(0, 0.4, 0.8, 0.5), (1.00, 0.50196, 0.50196, .5), (1.00000, 0.65098, 0.30196, .5)]
+    labels = ['PC', 'PV', 'SST']
+
+    for spikes, color, label in zip(neuron_spikes, colors, labels):
+        if len(spikes) > 0:
+            psth, bins = psth_calc(spikes, bin_size, duration)
+            ax2.bar(bins[:-1], psth, width=bin_size, align='edge', color=color, edgecolor='black', linewidth=1, label=label)
+
+    ax2.set_xlabel('Time (s)', fontsize=global_font_size)
+    ax2.set_ylabel('Spike count', fontsize=global_font_size)
+    ax2.spines['right'].set_visible(False)
+    ax2.spines['top'].set_visible(False)
+    ax2.set_xticks(np.arange(0, duration, 0.1))
+    ax2.xaxis.set_major_locator(ticker.MultipleLocator(.1))
+    ax2.yaxis.set_major_locator(ticker.MaxNLocator(integer=True))
+    ax2.tick_params(axis='both', which='major', labelsize=global_font_size - 2)
+    ax2.legend(loc="upper right", title='Neuron Type', numpoints=1, fontsize=legend_font_size, markerscale=3, title_fontsize=legend_title_font_size, frameon=True)
+
+    # More spacing between axes
+    plt.subplots_adjust(hspace=2)  # Adjust the hspace for better spacing between subplots
+    plt.tight_layout()
+
+    plt.savefig('figure_name.png', format='png', dpi=300)  # Save with high DPI
+    plt.show()
+

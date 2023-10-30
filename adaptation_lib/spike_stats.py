@@ -14,9 +14,116 @@ import matplotlib.patches as patches
 import matplotlib.lines as lines
 import matplotlib.ticker as ticker
 import matplotlib.colors as colors
+import timeout_decorator
+
 from scipy.stats import linregress
+from lib.dynapse2_raster import *
+
+def contains_nan(simulation_data,config_var_name_1,config_var_name_2,value_1, value_2):
+     idx_1 = np.argmin(np.abs(np.array(simulation_data[config_var_name_1]) - value_1))
+     idx_2 = np.argmin(np.abs(np.array(simulation_data[config_var_name_2]) - value_2))
+     index = len(simulation_data[config_var_name_2]) * idx_1 + idx_2
+     return np.isnan(simulation_data["cv_values_pc"][index]) or \
+            np.isnan(simulation_data["cv_values_pv"][index]) or \
+            np.isnan(simulation_data["synchrony_values_pc"][index]) or \
+            np.isnan(simulation_data["synchrony_values_pv"][index]) or \
+            np.isnan(simulation_data["mean_pc_rates"][index])
+
+@timeout_decorator.timeout(40)# Set a 5-second timeout
+def run_simulation(neuron_config):
+    return pc_pv_sst.pc_pv_sst(
+        board=board,
+        profile_path=profile_path,
+        number_of_chips=number_of_chips,
+        neuron_config=neuron_config
+    )
+
+def run_sweep(sweep_range_1, sweep_range_2, config_var_name_1, config_var_name_2, sweep_name, save_name, data_type_path, neuron_config):
+
+    data=os.path.join(data_type_path, f"{sweep_name}.npy")
+
+    if os.path.exists(data):
+        simulation_data = np.load(data, allow_pickle=True).item()
+    else:
+        simulation_data = {
+            "cv_values_pc": [np.nan] * len(sweep_range_1) * len(sweep_range_2),
+            "cv_values_pv": [np.nan] * len(sweep_range_1) * len(sweep_range_2),
+            "synchrony_values_pc": [np.nan] * len(sweep_range_1) * len(sweep_range_2),
+            "synchrony_values_pv": [np.nan] * len(sweep_range_1) * len(sweep_range_2),
+            "mean_pc_rates": [np.nan] * len(sweep_range_1) * len(sweep_range_2),
+            config_var_name_1: sweep_range_1,
+            config_var_name_2: sweep_range_2
+        }
+    for value_1 in simulation_data[config_var_name_1]:
+        neuron_config[config_var_name_1] = value_1
+        for value_2 in simulation_data[config_var_name_2]:
+            if contains_nan(value_1, value_2):
+                neuron_config[config_var_name_2] = value_2
+                try:
+                    [output_events, test_config] = run_simulation(neuron_config)
+
+                    cv_temp, synchrony_temp = run_dynamic_anal(output_events, test_config)
+
+                    rates = spike_count(output_events=output_events)
+                    PC_rates, _, _ = pop_rates(rates, test_config)
+
+                    index = len(simulation_data[config_var_name_2]) * list(simulation_data[config_var_name_1]).index(value_1) + list(simulation_data[config_var_name_2]).index(value_2)
+                    simulation_data["cv_values_pc"][index] = cv_temp[0]
+                    simulation_data["cv_values_pv"][index] = cv_temp[1]
+                    simulation_data["synchrony_values_pc"][index] = synchrony_temp[0]
+                    simulation_data["synchrony_values_pv"][index] = synchrony_temp[1]
+                    simulation_data["mean_pc_rates"][index] = np.mean(PC_rates)
+                except timeout_decorator.TimeoutError:
+                    print(f"Simulation timed out for {config_var_name_1} {value_1} and {config_var_name_2} {value_2}")
+                    index = len(simulation_data[config_var_name_2]) * list(simulation_data[config_var_name_1]).index(value_1) + list(simulation_data[config_var_name_2]).index(value_2)
+                    simulation_data["cv_values_pc"][index] = np.nan
+                    simulation_data["cv_values_pv"][index] = np.nan
+                    simulation_data["synchrony_values_pc"][index] = np.nan
+                    simulation_data["synchrony_values_pv"][index] = np.nan
+                    simulation_data["mean_pc_rates"][index] = np.nan
+
+    if not os.path.exists(data_type_path):
+        os.makedirs(data_type_path)
+    np.save(os.path.join(data_type_path, f"{save_name}.npy"), simulation_data)
 
 
+
+def get_id_times(nvn, pcn, test_id, time):
+    id = []
+    times = []
+    if pcn > 0:
+        condition = (test_id > nvn + 1) & (test_id < nvn + 1 + pcn)
+        id = test_id[condition]
+        times = time[condition]
+    return id, times
+
+
+def separate_raster_data(output_events, nvn, pcn, pvn, sstn):
+    # Transform the data
+    output_events = np.asanyarray(output_events)
+    times = output_events[1] - output_events[1][0]
+    spike_id = output_events[0]
+    
+    # Fetch the IDs and times for each neuron type
+    pc_id, pc_times = get_id_times(nvn, pcn, spike_id, times)
+    pv_id, pv_times = get_id_times(nvn + 1 + pcn, pvn, spike_id, times)
+    sst_id, sst_times = get_id_times(nvn + 2 + pcn + pvn, sstn, spike_id, times)
+    
+    if nvn > 0:
+        input_id = spike_id[spike_id <= nvn]
+        input_time = times[spike_id <= nvn]
+
+    raster_data={
+        'pc_id':pc_id,
+        'pc_times':pc_times,
+        'pv_id':pv_id,
+        'pv_times':pv_times,
+        'sst_id':sst_id,
+        'sst_times':sst_times,
+        'input_id':input_id,
+        'input_time':input_time
+    }
+    return raster_data
 
 def calculate_slope(time_axis, ff_windows_sst):
     slope, intercept, r_value, p_value, std_err = linregress(time_axis, ff_windows_sst)
@@ -250,9 +357,6 @@ def spike_train_synchrony_correlation(spike_times, spike_indices, total_duration
 	else:
 		# we only have one neuron spike train - no synchronisation
 		return 0.0
-
-
-
 
 def run_dynamic_anal(output_events,test_config):    
     nvn=test_config['nvn']

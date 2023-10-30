@@ -146,6 +146,16 @@ def striated_gen(virtual_group,neuron_config,rate):
         events=events+poisson_gen(2*pulse_duration+2*rest,pulse_duration,[virtual_group],[100])
         events=events+poisson_gen(3*pulse_duration+3*rest,pulse_duration,[virtual_group],[300])
         events=events+poisson_gen(4*pulse_duration+4*rest,pulse_duration,[virtual_group],[500])
+    elif input_type=='Poisson 3':
+        pulse_duration=50000#duration of each pulse
+        rest=50000 #duration of each rest
+        events=poisson_gen(0,pulse_duration,[virtual_group],[20])
+        events=events+poisson_gen(pulse_duration+rest,pulse_duration,[virtual_group],[20])
+        events=events+poisson_gen(2*pulse_duration+2*rest,pulse_duration,[virtual_group],[20])
+        events=events+poisson_gen(3*pulse_duration+3*rest,pulse_duration,[virtual_group],[20])
+        events=events+poisson_gen(4*pulse_duration+4*rest,pulse_duration,[virtual_group],[20])
+        events=events+poisson_gen(5*pulse_duration+5*rest,pulse_duration,[virtual_group],[20])
+    
 
      
     else:

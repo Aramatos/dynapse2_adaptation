@@ -26,7 +26,7 @@ def config():
         'overtake_test':False,
         'decay':False,
         'duration':1, #duration of simulation in seconds
-        'in_freq':200,#for single neuron tests
+        'in_freq':20,#for single neuron tests
         'in_DC':0,#for single neuron tests
         'plot_iter':False,#plot random search graphs
         'n_iter':20,#for Random searches
