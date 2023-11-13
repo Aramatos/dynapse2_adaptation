@@ -98,7 +98,7 @@ def get_id_times(nvn, pcn, test_id, time):
     return id, times
 
 
-def separate_raster_data(output_events, nvn, pcn, pvn, sstn):
+def population_data(output_events, nvn, pcn, pvn, sstn):
     # Transform the data
     output_events = np.asanyarray(output_events)
     times = output_events[1] - output_events[1][0]
