@@ -557,6 +557,54 @@ def annotate_plot_network(neuron_types,neuron_counts,neuron_config,ax):
                     plt.text(.15*5,-down_coordinate,annotation_string_3, transform=ax.transAxes, va="top", ha="left", fontsize=10, bbox=annotation_box_config)
                 plt.text(.15*i+.12, -down_coordinate, annotation_string, transform=ax.transAxes, va="top", ha="left", fontsize=10, bbox=annotation_box_config)
 
+def plot_heatmaps(data,xlabel):
+    # Extract data for plotting
+    cv_values_pc = data['cv_values_pc']
+    synchrony_values_pc = data['synchrony_values_pc']
+    mean_pc_rates = data['mean_pc_rates']
+
+    if 'input_frequencies' not in data:
+        data['input_frequencies']=np.arange(1,31,1)
+
+    input_frequencies = data['input_frequencies']
+    if 'connection_ratios' not in data:
+        data['connection_ratios']=np.arange(0,.7,.1)
+    connection_ratios = data['connection_ratios']
+    
+    # Reshape the flat lists into 2D arrays
+    cv_matrix = np.reshape(cv_values_pc, (len(input_frequencies), len(connection_ratios)))
+    synchrony_matrix = np.reshape(synchrony_values_pc, (len(input_frequencies), len(connection_ratios)))
+    mean_rates_matrix = np.reshape(mean_pc_rates, (len(input_frequencies), len(connection_ratios)))
+    
+    # Flip the matrices vertically so the lowest frequencies are at the bottom
+    cv_matrix = np.flipud(cv_matrix)
+    synchrony_matrix = np.flipud(synchrony_matrix)
+    mean_rates_matrix = np.flipud(mean_rates_matrix)
+    
+    # Create a 1x3 subplot for the heatmaps with a more square-like figure size
+    fig, axes = plt.subplots(1, 3, figsize=(15, 5), constrained_layout=True)
+    
+    # Titles for each subplot
+    titles = ['CV Values (PC)', 'Synchrony Values (PC)', 'Mean Firing Rates (PC)']
+    
+    # Plot each heatmap with aspect='auto' to allow each heatmap to fill the space of the subplot axes
+    for ax, matrix, title in zip(axes, [cv_matrix, synchrony_matrix, mean_rates_matrix], titles):
+        cax = ax.matshow(matrix, interpolation='nearest', aspect='auto')
+        fig.colorbar(cax, ax=ax)
+        ax.xaxis.set_ticks_position('bottom')
+        ax.set_xticks(np.linspace(0, len(connection_ratios) - 1, min(5, len(connection_ratios))))
+        ax.set_xticklabels(np.round(np.linspace(connection_ratios[0], connection_ratios[-1], min(5, len(connection_ratios))), 2))
+        ax.set_yticks(np.linspace(0, len(input_frequencies) - 1, min(5, len(input_frequencies))))
+        ax.set_yticklabels(np.round(np.linspace(input_frequencies[0], input_frequencies[-1], min(5, len(input_frequencies)))[::-1], 2))
+        ax.set_title(title)
+    
+    # Set y-label on the first subplot and x-labels on all
+    axes[0].set_ylabel('Input Frequencies')
+    for ax in axes:
+        ax.set_xlabel(xlabel)
+    
+    # Display the plot
+    plt.show()
          
 def plot_network_raster_psth(raster_data,duration, bin_size):
 

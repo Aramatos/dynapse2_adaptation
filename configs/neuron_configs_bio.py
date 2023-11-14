@@ -46,8 +46,8 @@ def config():
         'sweep_variable':'SYAM_STDW_N',#variable to sweep
         'sweep_coarse_val':0,
         'sweep_range_fine':np.linspace(0,250,5,dtype=int),
-        #F-I settings
-        'DC_Coarse':2,
+        #F-I sweep settings
+        'DC_Coarse':5,
         'DC_FI_Range':np.linspace(0,250,10,dtype=int),
         'Freq_FI_Range:':np.linspace(0,250,10,dtype=int),
         #population size
@@ -58,15 +58,15 @@ def config():
         #Probabilities
         'Input_PC':.3,
         'Input_PV':.11,
-        'Input_SST':.1,
+        'Input_SST':.05,
         'PC_PC':.2,
         'PC_PV':.15,
-        'PC_SST':.3,
+        'PC_SST':.01,
         'PV_PC':.2,
         'PV_PV':.2,
         'PV_SST':.2,
-        'SST_PC':.3,
-        'SST_PV':.2,
+        'SST_PC':.4,
+        'SST_PV':.4,
         #PC neuron parameters
         'PC_LEAK':[1,46],
         'PC_GAIN':[0,30],
@@ -95,7 +95,7 @@ def config():
         'PC_W0':[4,100], #input
         'PC_W1':[1,100], #recurrent PC tp PC
         'PC_W2':[2,100], #PV shunt inhitbiton to PC
-        'PC_W3':[2,100], #SST shunt inhibition
+        'PC_W3':[5,100], #SST shunt inhibition
         #||||||||||||||||||||||||||||||||||||||||||||||||||
         #PV neuron parameters
         'PV_LEAK':[1,90],
@@ -119,26 +119,26 @@ def config():
         'PV_W0':[3,100], #input
         'PV_W1':[1,100], # PC input
         'PV_W2':[4,250], # PV gaba inhitbiton
-        'PV_W3':[2,100], # SST shunt inhibition
+        'PV_W3':[5,100], # SST shunt inhibition
         #||||||||||||||||||||||||||||||||||||||||||||||||||
         #SST neuron parameters
-        'SST_LEAK':[1,44],
+        'SST_LEAK':[0,15],
         'SST_GAIN':[1,80],
         'SST_REF':[1,90],
         'SST_SPK_THR':[5,250],
         'SST_DC':[0,0],
         #SST input weight and synape parameters
-        'SST_AMPA_TAU':[1,60],
-        'SST_AMPA_GAIN':[5,200], 
+        'SST_AMPA_TAU':[0,15],
+        'SST_AMPA_GAIN':[3,120], 
         #SST self gaba  inhibiton from PV GABA B
         'SST_GABA_TAU':[0,15],
-        'SST_GABA_GAIN':[3,100],
+        'SST_GABA_GAIN':[3,120],
         #SST Inhibition from SST GABA A
         'SST_SHUNT_TAU':[1,30],
         'SST_SHUNT_GAIN':[1,90],
         #SST Weights
-        'SST_W0':[4,100], #input
-        'SST_W1':[4,200], #PC input
+        'SST_W0':[0,30], #input
+        'SST_W1':[0,20], #PC input
         'SST_W2':[0,50], # pv gaba inhitbiton
         'SST_W3':[0,0],# nothing is connected here
         }
