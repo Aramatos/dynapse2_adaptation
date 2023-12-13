@@ -25,7 +25,6 @@ import datetime
 
 board_names=["dev_board"]
 
-
 def pc_pv_sst(board, profile_path, number_of_chips,neuron_config):
     # Determine the user's home directory
     home_directory = os.path.expanduser("~")
@@ -68,7 +67,6 @@ def pc_pv_sst(board, profile_path, number_of_chips,neuron_config):
     PV = network.add_group(chip=0, core=1, size=neuron_config['pvn'])
     SST= network.add_group(chip=0, core=2, size=neuron_config['sstn'])
     #||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
-    print('Adding connections')
     #Input Connections
     network.add_connection(source=input1, target=PC, probability=neuron_config['Input_PC'],
                       dendrite=Dendrite.ampa, weight=[True, False, False, False],repeat=1)
@@ -103,7 +101,7 @@ def pc_pv_sst(board, profile_path, number_of_chips,neuron_config):
     #||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
     set_configs(myConfig,model,neuron_config)
     #||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
-    print("\nAll configurations done!\n")
+    print("\nNetwork Config Done\n")
     #||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
     #Emulation run
     #Input event
@@ -112,7 +110,7 @@ def pc_pv_sst(board, profile_path, number_of_chips,neuron_config):
     output_events=run_dynapse(neuron_config,board,input_events)
     print("Simulation done")
     # /⅞save_config_axis1(test_config,myConfig,number_of_chips,tname)
-    np.save(dir_path+"/pc_pv_s"+time_label,  output_events)
+    np.save(dir_path+"/pc_pv_sst"+time_label,  output_events)
     # /⅞print("time label: "+str(time_label))
 
     return output_events,test_config

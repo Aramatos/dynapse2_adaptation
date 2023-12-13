@@ -19,7 +19,7 @@ def get_events(board, extra_time, output_events):
             time_after_received_last_input += 1
 
 
-def spike_count(output_events, show=True, jitter=False):
+def spike_count(output_events, show=False, jitter=False):
 
     if jitter:
         # if there are multiple spikes when the neuron fires once, happens for the classic ExpIF neuron type

@@ -131,10 +131,9 @@ def get_connection_matrix(group_size, target_count, outdegree):
     return conn_matrix
 
 def run_dynapse(neuron_config,board,input_events):
-    print('initilize run dynapse')
+    print('initilize DynapSE Run')
     output_events = [[], []]
     send_virtual_events(board=board, virtual_events=[],min_delay=10000)
-    print('dummy events sent')
     get_events(board=board, extra_time=100, output_events=output_events)
     if neuron_config['input_type']=='DC':
       min_delay=neuron_config['duration']*1e6
@@ -155,8 +154,6 @@ def run_dynapse(neuron_config,board,input_events):
 
     # Assuming you wanted to add 0.2 to ts; make sure to convert ts to float if it's not
     ts = float(ts) + 0.2e6
-
-    print("\nsetting virtual neurons\n")
     send_virtual_events(board=board, virtual_events=input_events, offset=int(ts), min_delay=int(min_delay))
     output_events = [[], []]
     get_events(board=board, extra_time=10000, output_events=output_events)

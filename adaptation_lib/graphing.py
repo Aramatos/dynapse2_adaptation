@@ -573,15 +573,6 @@ def plot_heatmaps(data, xlabel, ratiolimit=1):
     else:
         connection_ratios = data['connection_ratios']
 
-    # Create a mask to limit the data up to a certain connection ratio
-    if ratiolimit < 1:
-        mask = connection_ratios <= ratiolimit
-        print(mask)
-        connection_ratios = connection_ratios[mask]
-        cv_values_pc = cv_values_pc[mask]
-        synchrony_values_pc = synchrony_values_pc[mask]
-        mean_pc_rates = mean_pc_rates[mask]
-
     # Reshape the flat lists into 2D arrays
     cv_matrix = np.reshape(cv_values_pc, (len(input_frequencies), len(connection_ratios)))
     synchrony_matrix = np.reshape(synchrony_values_pc, (len(input_frequencies), len(connection_ratios)))
