@@ -557,20 +557,31 @@ def annotate_plot_network(neuron_types,neuron_counts,neuron_config,ax):
                     plt.text(.15*5,-down_coordinate,annotation_string_3, transform=ax.transAxes, va="top", ha="left", fontsize=10, bbox=annotation_box_config)
                 plt.text(.15*i+.12, -down_coordinate, annotation_string, transform=ax.transAxes, va="top", ha="left", fontsize=10, bbox=annotation_box_config)
 
-def plot_heatmaps(data,xlabel):
+def plot_heatmaps(data, xlabel, ratiolimit=1):
     # Extract data for plotting
     cv_values_pc = data['cv_values_pc']
     synchrony_values_pc = data['synchrony_values_pc']
     mean_pc_rates = data['mean_pc_rates']
-
+    
     if 'input_frequencies' not in data:
         data['input_frequencies']=np.arange(1,31,1)
+    else:
+        input_frequencies = data['input_frequencies']
 
-    input_frequencies = data['input_frequencies']
     if 'connection_ratios' not in data:
         data['connection_ratios']=np.arange(0,.7,.1)
-    connection_ratios = data['connection_ratios']
-    
+    else:
+        connection_ratios = data['connection_ratios']
+
+    # Create a mask to limit the data up to a certain connection ratio
+    if ratiolimit < 1:
+        mask = connection_ratios <= ratiolimit
+        print(mask)
+        connection_ratios = connection_ratios[mask]
+        cv_values_pc = cv_values_pc[mask]
+        synchrony_values_pc = synchrony_values_pc[mask]
+        mean_pc_rates = mean_pc_rates[mask]
+
     # Reshape the flat lists into 2D arrays
     cv_matrix = np.reshape(cv_values_pc, (len(input_frequencies), len(connection_ratios)))
     synchrony_matrix = np.reshape(synchrony_values_pc, (len(input_frequencies), len(connection_ratios)))
