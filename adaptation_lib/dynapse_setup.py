@@ -83,7 +83,6 @@ def set_DC_parameter(myConfig,model,coarse,fine):
 
     return
 def set_monitors(myConfig,model,test_config,PC=0,PV=0,SST=0):
-   print("Setting monitors")
    pcn=test_config['pcn']
    pvn=test_config['pvn']
    sstn=test_config['sstn']
@@ -141,7 +140,7 @@ def run_dynapse(neuron_config,board,input_events):
       min_delay=neuron_config['duration']*1e6
     else:
       min_delay=10000
-    print("\ngetting fpga time\n")
+    print("\ngetting fpga time")
     ts = get_fpga_time(board=board) + 100000
     while True:
         ts = get_fpga_time(board=board)  # get current time of FPGA

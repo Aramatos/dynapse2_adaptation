@@ -101,7 +101,7 @@ def pc_pv_sst(board, profile_path, number_of_chips,neuron_config):
     #||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
     set_configs(myConfig,model,neuron_config)
     #||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
-    print("\nNetwork Config Done\n")
+    print("\nNetwork Config Done")
     #||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
     #Emulation run
     #Input event
