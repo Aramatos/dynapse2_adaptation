@@ -565,13 +565,13 @@ def plot_heatmaps(data, xlabel):
     
     if 'input_frequencies' not in data:
         data['input_frequencies']=np.arange(1,31,1)
-    else:
-        input_frequencies = data['input_frequencies']
+    
+    input_frequencies = data['input_frequencies']
 
     if 'connection_ratios' not in data:
-        data['connection_ratios']=np.arange(0,.7,.1)
-    else:
-        connection_ratios = data['connection_ratios']
+        data['connection_ratios']=np.arange(0,.6,.1)
+
+    connection_ratios = data['connection_ratios']
 
     # Reshape the flat lists into 2D arrays
     cv_matrix = np.reshape(cv_values_pc, (len(input_frequencies), len(connection_ratios)))
