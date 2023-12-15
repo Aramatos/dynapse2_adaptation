@@ -104,7 +104,6 @@ def set_monitors(myConfig,model,test_config,PC=0,PV=0,SST=0):
    time.sleep(0.1)
 
 def set_latches(myConfig,model, neuron_config, number_of_chips):
-    print("Setting Latches")
     if neuron_config['PC_Adaptation']==True:
         set_adaptation_latches(config=myConfig, neurons=range(256), cores=[0], chips=range(number_of_chips))
         model.apply_configuration(myConfig)
