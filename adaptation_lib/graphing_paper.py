@@ -557,7 +557,7 @@ def annotate_plot_network(neuron_types,neuron_counts,neuron_config,ax):
                     plt.text(.15*5,-down_coordinate,annotation_string_3, transform=ax.transAxes, va="top", ha="left", fontsize=10, bbox=annotation_box_config)
                 plt.text(.15*i+.12, -down_coordinate, annotation_string, transform=ax.transAxes, va="top", ha="left", fontsize=10, bbox=annotation_box_config)
 
-def plot_3_heatmaps(data, xlabel):
+def plot_heatmaps(data, xlabel):
     # Extract data for plotting
     cv_values_pc = data['cv_values_pc']
     synchrony_values_pc = data['synchrony_values_pc']
